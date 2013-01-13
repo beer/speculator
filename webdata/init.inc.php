@@ -1,6 +1,8 @@
 <?php
 define("WWW_HOST", $_SERVER['SERVER_NAME']);
 define("STATIC_PATH", '');
+define("LIB_PATH", __DIR__);
+error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
 //define('MEMCACHEHOST', 'localhost');
 //define('MEMCACHEPORT', '11211');
 
@@ -20,16 +22,12 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 call_user_func(function() {
     $loader = new UniversalClassLoader();
     $loader->register();
-    $loader->registerNamespaceFallback(EATGOCORE_PATH . '/extlibs');
+    $loader->registerNamespaceFallback(__DIR__ . '/extlibs');
     $loader->registerPrefixFallbacks(array(
-        EATGOCORE_PATH . '/libs',
-        EATGOCORE_PATH . '/extlibs',
-        EATGOCORE_PATH . '/models',
-        EATGOCORE_PATH . '/forms',
+        __DIR__ . '/libs',
+        __DIR__ . '/extlibs',
         __DIR__ . '/models',
         __DIR__ . '/helpers',
-        __DIR__ . '/forms',
-        __DIR__ . '/libs'
     ));
 });
 

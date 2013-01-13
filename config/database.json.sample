@@ -1,0 +1,14 @@
+{
+    "develop":{
+        "host":"",
+        "user":"",
+        "password":"",
+        "database":""
+    },
+    "production":{
+        "host":"",
+        "user":"",
+        "password":"",
+        "database":""
+    }
+}

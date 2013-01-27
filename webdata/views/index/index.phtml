@@ -1,2 +1,120 @@
-<?php
-phpinfo();
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    /*
+	$.getJSON('http://www.highcharts.com/samples/data/jsonp.php?filename=aapl-ohlc.json&callback=?', function(data) {
+        console.log(data);
+    });
+     */
+	$.getJSON('/ajax/twii', function(data) {
+		// create the chart
+        var weeks = ['日', '一', '二', '三', '四', '五', '六'];
+		chart = new Highcharts.StockChart({
+			chart : {
+				renderTo : 'container'
+			},
+			rangeSelector : {
+				selected : 1
+			},
+			title : {
+				text : '台灣加權指數'
+			},
+            tooltip: {
+                shared: true,
+                formatter: function(){
+                    //console.log(this.points);
+                    if (_.isUndefined(this.y)) {
+                        return this.point.text;
+                    }
+                    var d = new XDate(this.x);
+                    var w = d.getDay();
+                    var p = '<b>'+ d.toString('yyyy/MM/dd(') + weeks[w] +')</b><br/>';
+
+                    $.each(this.points, function(i, series){
+                            p += '開盤: ' + series.point.open + '<br/>'+
+                                '最高: ' + series.point.high + '<br/>'+
+                                '最低: ' + series.point.low + '<br/>'+
+                                '收盤: ' + series.point.close +'<br/>';
+                    });
+                    $.post('/ajax/getDayInfo', {day: d.toString('yyyy-MM-dd')}, function(response) {
+                        if (!response.error) {
+                            //$('.highcharts-tooltip text').html(response.content);
+                            $('#info').html(response.content);
+                            console.log(response.content);
+                        }
+                    });
+                    return p;
+                }
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {
+                                var d = new XDate(this.x);
+                                $.post('/ajax/getDayInfo', {day: d.toString('yyyy-MM-dd')}, function(response) {
+                                    if (!response.error) {
+                                        $('.highcharts-tooltip text').html(response.content);
+                                        console.log(response.content);
+                                    }
+                                });
+                            }
+                        }
+                    },
+                    marker: {
+                        lineWidth: 1
+                    }
+                }
+            },
+			series : [{
+				type : 'candlestick',
+				name : '台灣加權指數',
+                id: 'twii',
+				data : data,
+				dataGrouping : {
+					units : [
+						['day', // unit name
+						[1, 5] // allowed multiples
+					]]
+				}
+            },{
+                type : 'flags',
+                data : [{
+                    x : Date.UTC(2012, 11, 11),
+                    title : '多',
+                    text : '這是一個做多點'
+                }, {
+                    x : Date.UTC(2013, 0, 11),
+                    title : '空',
+                    text : '要空嗎？'
+                }, {
+                    x : Date.UTC(2013, 1, 1),
+                    title : '$',
+                    text : '我要努力賺錢'
+                }],
+                onSeries: 'twii',
+                shape: 'circlepin',
+                width: 16
+            }]
+		});
+	});
+});
+
+		</script>
+</head>
+<body>
+
+<div id="container" style="height: 1000px; min-width: 250px"></div>
+<div id="info"></div>
+    
+<script src="/js/highstock/highstock.js"></script>
+<script src="/js/highstock/modules/exporting.js"></script>
+<script src="/js/xdate.js"></script>
+<script src="/js/underscore-min.js"></script>
+</body>
+</html>

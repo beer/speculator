@@ -16,7 +16,7 @@ class Candle extends SpeculatorTable
 {
     public function init()
     {
-        $this->_name = 'candle';
+        $this->_name = 'candles';
         $this->_rowClass = 'CandleRow';
 
         $this->_primary = 'id';

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <div class="alert alert-error">
+    <?= $this->exception->getMessage() ?>
+    <?php var_dump($this->exception); ?>
+    <button class="close">&times;</button>
+    </div>
+</body>
+</html>

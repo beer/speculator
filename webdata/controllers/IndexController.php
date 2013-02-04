@@ -17,7 +17,7 @@ class IndexController extends Pix_Controller
         $this->json($data);
     }
 
-    public function dayinfoAction()
+    public function infoAction()
     {
         $v = $this->view;
         $v->day = strtotime($_GET['day']);

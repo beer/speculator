@@ -1,3 +1,11 @@
 <?= $this->partial('/common/header.phtml', $this); ?>
-<?= $this->partial('/ajax/dayinfo.phtml', $this); ?>
+<?php
+$previous_clearance = StdLib::getClearance(-1, $this->day);
+$clearance = StdLib::getClearance(0, $this->day);
+$next_clearance = StdLib::getClearance(1, $this->day);
+?>
+上月結算日：<?= date('Y/m/d', $previous_clearance); ?> ,
+本月結算日：<?= date('Y/m/d', $clearance); ?> ,
+下月結算日：<?= date('Y/m/d', $next_clearance); ?>
+<?= $this->partial('/index/dayinfo.phtml', $this); ?>
 <?= $this->partial('/common/footer.phtml', $this); ?>

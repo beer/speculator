@@ -10,6 +10,17 @@ class OptionContractRow extends Pix_Table_Row
     {
         $this->updated_at = time();
     }
+
+    public function previous()
+    {
+        $yestoday = $this->date;
+        while ($yestoday = $yestoday - 86400) {
+            $row = OptionContract::search(array('date' => $yestoday));
+            if (sizeof($row)) {
+                return $row->first();
+            }
+        }
+    }
 }
 
 class OptionContract extends SpeculatorTable

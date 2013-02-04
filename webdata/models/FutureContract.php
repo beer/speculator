@@ -10,6 +10,26 @@ class FutureContractRow extends Pix_Table_Row
     {
         $this->updated_at = time();
     }
+
+    public function clearance($diff = 0)
+    {
+        $now = time();
+        $year = date('Y', $now);
+        $month = date('m', $now);
+
+        return strtotime("third Wednesday", mktime(0, 0, 0, $month + $diff, 0, $year));
+    }
+
+    public function previous()
+    {
+        $yestoday = $this->date;
+        while ($yestoday = $yestoday - 86400) {
+            $row = FutureContract::search(array('date' => $yestoday));
+            if (sizeof($row)) {
+                return $row->first();
+            }
+        }
+    }
 }
 
 class FutureContract extends SpeculatorTable

@@ -2,6 +2,11 @@
 define("WWW_HOST", $_SERVER['SERVER_NAME']);
 define("STATIC_PATH", '');
 define("LIB_PATH", __DIR__);
+
+//ini_set("display_errors", "On");
+//ini_set("display_startup_errors", "On");
+//ini_set("html_errors", "On");
+
 error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
 //define('MEMCACHEHOST', 'localhost');
 //define('MEMCACHEPORT', '11211');

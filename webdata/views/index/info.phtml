@@ -1,0 +1,72 @@
+<?= $this->partial('/common/header.phtml', $this); ?>
+<style type="text/css">
+table#dayinfo {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
+}
+table#dayinfo th {
+    width: 65px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
+}
+table#dayinfo td {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
+}
+</style>
+<?php
+$clearance = StdLib::getClearance(0, $day);
+$previous_clearance = StdLib::getClearance(-1, $day);
+$next_clearance = StdLib::getClearance(1, $day);
+?>
+上月結算日：<?= date('Y/m/d', $previous_clearance); ?> ,
+本月結算日：<?= date('Y/m/d', $clearance); ?> ,
+下月結算日：<?= date('Y/m/d', $next_clearance); ?>
+<table id="dayinfo">
+    <tr>
+        <th colspan="2"><?= date('Y/m/d', $this->day); ?></th>
+        <th colspan="6">自營</th>
+        <th colspan="6">外資</th>
+    </tr>
+    <tr>
+        <th colspan="2"></th>
+        <th colspan="2">庫存</th>
+        <th colspan="2">與前日比較</th>
+        <th colspan="2"></th>
+        <th colspan="2">庫存</th>
+        <th colspan="2">與前日比較</th>
+        <th colspan="2"></th>
+    </tr>
+    <tr>
+        <th>日期</th>
+        <th>商品</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>淨部位</th>
+        <th>淨部位變化</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>淨部位</th>
+        <th>淨部位變化</th>
+    </tr>
+    <?php 
+    for ($t = $previous_clearance + 86400; $t <= $clearance; $t += 86400) {
+        echo $this->partial('/ajax/dayinfo_row.phtml', array('today' => $t));
+    }
+    ?>
+</table>
+<?= $this->partial('/common/footer.phtml', $this); ?>

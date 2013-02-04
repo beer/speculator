@@ -45,7 +45,7 @@ foreach ($years as $y) {
                     $row->save();
                 }
 
-                echo $tr->innertext . PHP_EOL;
+                //echo $tr->innertext . PHP_EOL;
             }
         }
     }

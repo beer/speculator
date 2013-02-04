@@ -1,0 +1,169 @@
+<style type="text/css">
+table#dayinfo {
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 1px;
+    border-color: #666666;
+    border-collapse: collapse;
+}
+table#dayinfo th {
+    width: 60px;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #dedede;
+}
+table#dayinfo td {
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #666666;
+    background-color: #ffffff;
+}
+</style>
+<?php
+$day = $yestoday = $this->day;
+while ($yestoday = $yestoday - 86400) {
+    $row = FutureContract::search(array('date' => $yestoday));
+    if (sizeof($row)) {
+        break;
+    }
+}
+$future_1 = FutureContract::search(array('date' => $day, 'user_id' => 1))->first();
+$option_1 = OptionContract::search(array('date' => $day, 'user_id' => 1))->first();
+$future_1_yestoday = FutureContract::search(array('date' => $yestoday, 'user_id' => 1))->first();
+$option_1_yestoday = OptionContract::search(array('date' => $yestoday, 'user_id' => 1))->first();
+$future_3 = FutureContract::search(array('date' => $day, 'user_id' => 3))->first();
+$option_3 = OptionContract::search(array('date' => $day, 'user_id' => 3))->first();
+$future_3_yestoday = FutureContract::search(array('date' => $yestoday, 'user_id' => 3))->first();
+$option_3_yestoday = OptionContract::search(array('date' => $yestoday, 'user_id' => 3))->first();
+?>
+<table id="dayinfo">
+    <tr>
+        <th colspan="2"><?= date('Y/m/d', $day); ?></th>
+        <th colspan="6">自營</th>
+        <th colspan="6">外資</th>
+    </tr>
+    <tr>
+        <th colspan="2"></th>
+        <th colspan="2">庫存</th>
+        <th colspan="2">與前日比較</th>
+        <th colspan="2"></th>
+        <th colspan="2">庫存</th>
+        <th colspan="2">與前日比較</th>
+        <th colspan="2"></th>
+    </tr>
+    <tr>
+        <th>日期</th>
+        <th>商品</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>淨部位</th>
+        <th>淨部位變化</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>買方</th>
+        <th>賣方</th>
+        <th>淨部位</th>
+        <th>淨部位變化</th>
+    </tr>
+    <tr>
+        <td><?= date('Y/m/d', $yestoday); ?></td>
+        <td>台指期貨</td>
+        <td><?= $future_1_yestoday->buy; ?></td>
+        <td><?= $future_1_yestoday->sell; ?></td>
+        <td></td>
+        <td></td>
+        <td><?= $future_1_yestoday->buy - $future_1_yestoday->sell ?></td>
+        <td></td>
+        <td><?= $future_3_yestoday->buy; ?></td>
+        <td><?= $future_3_yestoday->sell; ?></td>
+        <td></td>
+        <td></td>
+        <td><?= $future_3_yestoday->buy - $future_3_yestoday->sell ?></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>台指買權</td>
+        <td><?= $option_1_yestoday->buycall; ?></td>
+        <td><?= $option_1_yestoday->sellcall; ?></td>
+        <td></td>
+        <td></td>
+        <td><?= $option_1_yestoday->buycall - $option_1_yestoday->sellcall ?></td>
+        <td></td>
+        <td><?= $option_3_yestoday->buycall; ?></td>
+        <td><?= $option_3_yestoday->sellcall; ?></td>
+        <td></td>
+        <td></td>
+        <td><?= $option_3_yestoday->buycall - $option_3_yestoday->sellcall ?></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>台指賣權</td>
+        <td><?= $option_1_yestoday->buyput; ?></td>
+        <td><?= $option_1_yestoday->sellput; ?></td>
+        <td></td>
+        <td></td>
+        <td><?= $option_1_yestoday->buyput - $option_1_yestoday->sellput ?></td>
+        <td></td>
+        <td><?= $option_3_yestoday->buyput; ?></td>
+        <td><?= $option_3_yestoday->sellput; ?></td>
+        <td></td>
+        <td></td>
+        <td><?= $option_3_yestoday->buyput - $option_3_yestoday->sellput ?></td>
+        <td></td>
+    <tr>
+        <td><?= date('Y/m/d', $day); ?></td>
+        <td>台指期貨</td>
+        <td><?= $future_1->buy; ?></td>
+        <td><?= $future_1->sell; ?></td>
+        <td><?= $future_1->buy - $future_1_yestoday->buy; ?></td>
+        <td><?= $future_1->sell - $future_1_yestoday->sell; ?></td>
+        <td><?= $future_1->buy - $future_1->sell; ?></td>
+        <td><?= ($future_1->buy - $future_1->sell) - ($future_1_yestoday->buy - $future_1_yestoday->sell); ?></td>
+        <td><?= $future_3->buy; ?></td>
+        <td><?= $future_3->sell; ?></td>
+        <td><?= $future_3->buy - $future_3_yestoday->buy; ?></td>
+        <td><?= $future_3->sell - $future_3_yestoday->sell; ?></td>
+        <td><?= $future_3->buy - $future_3->sell; ?></td>
+        <td><?= ($future_3->buy - $future_3->sell) - ($future_3_yestoday->buy - $future_3_yestoday->sell); ?></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>台指買權</td>
+        <td><?= $option_1->buycall; ?></td>
+        <td><?= $option_1->sellcall; ?></td>
+        <td><?= $option_1->buycall - $option_1_yestoday->buycall; ?></td>
+        <td><?= $option_1->sellcall - $option_1_yestoday->sellcall; ?></td>
+        <td><?= $option_1->buycall - $option_1->sellcall ?></td>
+        <td><?= ($option_1->buycall - $option_1->sellcall) - ($option_1_yestoday->buycall - $option_1_yestoday->sellcall);?></td>
+        <td><?= $option_3->buycall; ?></td>
+        <td><?= $option_3->sellcall; ?></td>
+        <td><?= $option_3->buycall - $option_3_yestoday->buycall; ?></td>
+        <td><?= $option_3->sellcall - $option_3_yestoday->sellcall; ?></td>
+        <td><?= $option_3->buycall - $option_3->sellcall ?></td>
+        <td><?= ($option_3->buycall - $option_3->sellcall) - ($option_3_yestoday->buycall - $option_3_yestoday->sellcall);?></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>台指賣權</td>
+        <td><?= $option_1->buyput; ?></td>
+        <td><?= $option_1->sellput; ?></td>
+        <td><?= $option_1->buyput - $option_1_yestoday->buyput; ?></td>
+        <td><?= $option_1->sellput - $option_1_yestoday->sellput; ?></td>
+        <td><?= $option_1->buyput - $option_1->sellput ?></td>
+        <td><?= ($option_1->buyput - $option_1->sellput) - ($option_1_yestoday->buyput - $option_1_yestoday->sellput);?></td>
+        <td><?= $option_3->buyput; ?></td>
+        <td><?= $option_3->sellput; ?></td>
+        <td><?= $option_3->buyput - $option_3_yestoday->buyput; ?></td>
+        <td><?= $option_3->sellput - $option_3_yestoday->sellput; ?></td>
+        <td><?= $option_3->buyput - $option_3->sellput ?></td>
+        <td><?= ($option_3->buyput - $option_3->sellput) - ($option_3_yestoday->buyput - $option_3_yestoday->sellput);?></td>
+    </tr>
+</table>

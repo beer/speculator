@@ -29,14 +29,14 @@ class OptionTrade extends SpeculatorTable
         $this->_columns['buycall_amount'] = array('type' => 'int', 'size' => 10);
         $this->_columns['buyput'] = array('type' => 'int', 'size' => 10);
         $this->_columns['buyput_amount'] = array('type' => 'int', 'size' => 10);
-        $this->_columns['buydiff'] = array('type' => 'int', 'size' => 10);
-        $this->_columns['buydiff_amount'] = array('type' => 'int', 'size' => 10);
+        $this->_columns['calldiff'] = array('type' => 'int', 'size' => 10);
+        $this->_columns['calldiff_amount'] = array('type' => 'int', 'size' => 10);
         $this->_columns['sellcall'] = array('type' => 'int', 'size' => 10);
         $this->_columns['sellcall_amount'] = array('type' => 'int', 'size' => 10);
         $this->_columns['sellput'] = array('type' => 'int', 'size' => 10);
         $this->_columns['sellput_amount'] = array('type' => 'int', 'size' => 10);
-        $this->_columns['selldiff'] = array('type' => 'int', 'size' => 10);
-        $this->_columns['selldiff_amount'] = array('type' => 'int', 'size' => 10);
+        $this->_columns['putdiff'] = array('type' => 'int', 'size' => 10);
+        $this->_columns['putdiff_amount'] = array('type' => 'int', 'size' => 10);
         $this->_columns['created_at'] = array('type' => 'int', 'size' => 10);
         $this->_columns['updated_at'] = array('type' => 'int', 'size' => 10);
     }

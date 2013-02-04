@@ -10,6 +10,7 @@ set :deploy_to, "/srv/www/#{application}-dev"
 # your SCM below:
 set :scm, :git
 set :repository, "git@github.com:beer/speculator.git"
+set :git_enable_submodules, 1
 #set :scm_passphrase, ""
 
 set :user, "beer"

@@ -64,5 +64,5 @@ while ($yestoday = $yestoday - 86400) {
         <th>淨部位變化</th>
     </tr>
     <?= $this->partial('/ajax/dayinfo_row.phtml', array('today' => $yestoday)); ?>
-    <?= $this->partial('/ajax/dayinfo_row.phtml', array('today' => $today)); ?>
+    <?= $this->partial('/ajax/dayinfo_row.phtml', array('today' => $day)); ?>
 </table>

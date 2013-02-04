@@ -1,4 +1,4 @@
-set :application, "speculator.im"
+set :application, "speculator"
 set :repository,  "set your repository location here"
 
 # If you aren't deploying to /u/apps/#{application} on the target

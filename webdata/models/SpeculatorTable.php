@@ -5,7 +5,12 @@ class SpeculatorTable extends Pix_Table
     {
         // for auke.us
         if (!getenv('DATABASE_URL')) {
-            $json = file_get_contents(__DIR__ . '/../../config/database.json');
+            if (file_exists(__DIR__ . '/../../config/database.json')) {
+                $json = file_get_contents(__DIR__ . '/../../config/database.json');
+            } else {
+                $json = file_get_contents('/srv/config/database.json');
+            }
+            
             $config = json_decode($json)->develop;
 
             $link = new mysqli($config->host, $config->user, $config->password, $config->database);

@@ -24,7 +24,7 @@ class FutureContractRow extends Pix_Table_Row
     {
         $yestoday = $this->date;
         while ($yestoday = $yestoday - 86400) {
-            $row = FutureContract::search(array('date' => $yestoday));
+            $row = FutureContract::search(array('date' => $yestoday, 'user_id' => $this->user_id));
             if (sizeof($row)) {
                 return $row->first();
             }

@@ -5,6 +5,7 @@ if (sizeof($future_1)) {
     $future_1_yestoday = $future_1->previous();
     $option_1 = OptionContract::search(array('date' => $today, 'user_id' => 1))->first();
     $option_1_yestoday = $option_1->previous();
+
     $future_3 = FutureContract::search(array('date' => $today, 'user_id' => 3))->first();
     $future_3_yestoday = $future_3->previous();
     $option_3 = OptionContract::search(array('date' => $today, 'user_id' => 3))->first();

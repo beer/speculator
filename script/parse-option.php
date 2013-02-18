@@ -1,3 +1,4 @@
+#!/usr/bin/php -q
 <?php
 include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');

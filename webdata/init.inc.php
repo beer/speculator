@@ -3,7 +3,7 @@ define("WWW_HOST", $_SERVER['SERVER_NAME']);
 define("STATIC_PATH", '');
 define("LIB_PATH", __DIR__);
 
-ini_set("display_errors", "On");
+//ini_set("display_errors", "On");
 //ini_set("display_startup_errors", "On");
 //ini_set("html_errors", "On");
 
@@ -24,11 +24,10 @@ require (__DIR__ . '/extlibs/Symfony/Component/ClassLoader/UniversalClassLoader.
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
-echo __DIR__ . PHP_EOL;
 call_user_func(function() {
     $loader = new UniversalClassLoader();
     $loader->register();
-    //$loader->registerNamespaceFallback(__DIR__ . '/extlibs');
+    $loader->registerNamespaceFallback(__DIR__ . '/extlibs');
     $loader->registerPrefixFallbacks(array(
         __DIR__ . '/libs',
         __DIR__ . '/extlibs',

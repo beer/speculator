@@ -3,7 +3,7 @@ define("WWW_HOST", $_SERVER['SERVER_NAME']);
 define("STATIC_PATH", '');
 define("LIB_PATH", __DIR__);
 
-ini_set("display_errors", "On");
+//ini_set("display_errors", "On");
 //ini_set("display_startup_errors", "On");
 //ini_set("html_errors", "On");
 
@@ -20,7 +20,7 @@ error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
 // add Memcache Server
 //Pix_Cache::addServer('Pix_Cache_Adapter_Memcache', json_decode(file_get_contents('/services/config/memcache.json'), true));
 
-require (__DIR__ . '/extlibs/symfony/Component/ClassLoader/UniversalClassLoader.php');
+require (__DIR__ . '/extlibs/Symfony/Component/ClassLoader/UniversalClassLoader.php');
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 

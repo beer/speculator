@@ -37,4 +37,4 @@ call_user_func(function() {
 });
 
 // show SQL query
-Pix_Table::enableLog(Pix_Table::LOG_QUERY);
+//Pix_Table::enableLog(Pix_Table::LOG_QUERY);

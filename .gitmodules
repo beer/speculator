@@ -1,3 +1,0 @@
-[submodule "webdata/extsrc/Symfony/Component/ClassLoader"]
-	path = webdata/extsrc/Symfony/Component/ClassLoader
-	url = git@github.com:symfony/ClassLoader.git

@@ -24,6 +24,7 @@ require (__DIR__ . '/extlibs/Symfony/Component/ClassLoader/UniversalClassLoader.
 
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
+echo __DIR__ . PHP_EOL;
 call_user_func(function() {
     $loader = new UniversalClassLoader();
     $loader->register();

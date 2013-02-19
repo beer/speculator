@@ -27,7 +27,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 call_user_func(function() {
     $loader = new UniversalClassLoader();
     $loader->register();
-    $loader->registerNamespaceFallback(__DIR__ . '/extlibs');
+    //$loader->registerNamespaceFallback(__DIR__ . '/extlibs');
     $loader->registerPrefixFallbacks(array(
         __DIR__ . '/libs',
         __DIR__ . '/extlibs',
@@ -37,4 +37,4 @@ call_user_func(function() {
 });
 
 // show SQL query
-//Pix_Table::enableLog(Pix_Table::LOG_QUERY);
+Pix_Table::enableLog(Pix_Table::LOG_QUERY);

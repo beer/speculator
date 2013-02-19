@@ -21,7 +21,9 @@ table#dayinfo td {
     padding: 8px;
     border-style: solid;
     border-color: #666666;
-    background-color: #ffffff;
+}
+.day_background {
+    background-color:#E0E0E0;
 }
 </style>
 <?php
@@ -63,9 +65,11 @@ $next_clearance = StdLib::getClearance(1, $this->day);
         <th>淨部位</th>
         <th>淨部位變化</th>
     </tr>
-    <?php 
+    <?php
+    $bgColor = true;
     for ($t = $previous_clearance + 86400; $t <= $clearance; $t += 86400) {
-        echo $this->partial('/ajax/dayinfo_row.phtml', array('today' => $t));
+        $bgColor = !$bgColor;
+        echo $this->partial('/ajax/dayinfo_row.phtml', array('today' => $t, 'bgColor' => $bgColor));
     }
     ?>
 </table>

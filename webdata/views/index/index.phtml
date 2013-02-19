@@ -38,7 +38,8 @@ $(function() {
                             p += '開盤: ' + series.point.open + '<br/>'+
                                 '最高: ' + series.point.high + '<br/>'+
                                 '最低: ' + series.point.low + '<br/>'+
-                                '收盤: ' + series.point.close +'<br/>';
+                                '收盤: ' + series.point.close +'<br/>'+
+                                '均價: ' + ((series.point.high + series.point.low)/2).toFixed(2) +'<br/>';
                     });
                     $.post('/ajax/getDayInfo', {day: d.toString('yyyy-MM-dd')}, function(response) {
                         if (!response.error) {
@@ -67,6 +68,10 @@ $(function() {
                     marker: {
                         lineWidth: 1
                     }
+                },
+                candlestick: {
+                    color: 'green',
+                    upColor: 'red'
                 }
             },
 			series : [{

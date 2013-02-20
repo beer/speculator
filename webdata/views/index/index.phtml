@@ -41,12 +41,6 @@ $(function() {
                                 '收盤: ' + series.point.close +'<br/>'+
                                 '均價: ' + ((series.point.high + series.point.low)/2).toFixed(2) +'<br/>';
                     });
-                    $.post('/ajax/getDayInfo', {day: d.toString('yyyy-MM-dd')}, function(response) {
-                        if (!response.error) {
-                            //$('.highcharts-tooltip text').html(response.content);
-                            $('#info').html(response.content);
-                        }
-                    });
                     return p;
                 }
             },
@@ -56,11 +50,13 @@ $(function() {
                     point: {
                         events: {
                             click: function() {
+                                chart.showLoading('Loading data...');
                                 var d = new XDate(this.x);
                                 $.post('/ajax/getDayInfo', {day: d.toString('yyyy-MM-dd')}, function(response) {
                                     if (!response.error) {
-                                        $('.highcharts-tooltip text').html(response.content);
+                                        $('#info').html(response.content);
                                     }
+                                    chart.hideLoading();
                                 });
                             }
                         }

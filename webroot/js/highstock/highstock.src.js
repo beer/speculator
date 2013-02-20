@@ -15850,7 +15850,9 @@ var OHLCSeries = extendClass(seriesTypes.column, {
 
 		for (i = 0; i < length; i++) {
 			point = points[i];
-			isUpDay = i > 0 ? points[i - 1].close < point.close : point.open < point.close;
+			// modify
+			//isUpDay = i > 0 ? points[i - 1].close < point.close : point.open < point.close;
+			isUpDay = i > 0 ? point.open < point.close : point.open < point.close;
 
 			if (isUpDay) {
 				point.pointAttr = seriesDownPointAttr;

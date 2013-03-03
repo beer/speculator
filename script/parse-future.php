@@ -90,7 +90,7 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
             }
             echo PHP_EOL;
         }
-        rename($file, 'taifex-futures-' . date('Y/m/d', $time) . '.html');
+        rename($file, 'taifex-futures-' . date('Y-m-d', $time) . '.html');
     } else {
         echo date('Y/m/d', $time) . 'no' . PHP_EOL;
     }

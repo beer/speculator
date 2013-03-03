@@ -179,7 +179,7 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
                 //var_dump($trades[$i]->toArray());
             }
         }
-        rename($file, 'taifex-options-' . date('Y/m/d', $time) . '.html');
+        rename($file, 'taifex-options-' . date('Y-m-d', $time) . '.html');
     } else {
         echo date('Y/m/d', $time) . 'no' . PHP_EOL;
     }

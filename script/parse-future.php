@@ -50,7 +50,8 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
     echo '期';
     $columns = array('buy', 'buy_amount', 'sell', 'sell_amount', 'diff', 'diff_amount', 'buy', 'buy_amount', 'sell', 'sell_amount', 'diff', 'diff_amount',);
     $users = array('', '自營商', '投信', '外資');
-    if (count($table)) {
+    $page_time = strtotime(str_replace('/', '-', $pageHtml->find('#datestart', 0)->value));
+    if (count($table) and $time == $page_time) {
         echo date('Y/m/d', $time) . 'ok' . PHP_EOL;
         // 3 ~ 6 的 tr 正好是，三大法人
         for ($i = 3; $i < 6; $i++) {

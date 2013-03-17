@@ -32,7 +32,7 @@ if (sizeof($future_1)) {
 <tr <?= ($this->bgColor) ? 'class="day_background"' : ''?>>
     <td></td>
     <td style="color:#FF0000">台指買權</td>
-    <td><?= $option_3->buycall; ?></td>
+    <td title="<?='契約金額:' . number_format($option_3->buycall_amount) . '  平均點數:' . $option_3->buycall_amount*1000/$option_3->buycall/50; ?>"><?= $option_3->buycall; ?></td>
     <td><?= $option_3->sellcall; ?></td>
     <td><?= $option_3->buycall - $option_3_yestoday->buycall; ?></td>
     <td><?= $option_3->sellcall - $option_3_yestoday->sellcall; ?></td>

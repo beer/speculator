@@ -1,6 +1,6 @@
 <?php
 include(__DIR__ . '/../webdata/init.inc.php');
-$time = strtotime('2013-2-28');
+$time = strtotime('2013-3-3');
 $rows = Candle::search(array('time' => $time));
 if (sizeof($rows)) {
     $rows->delete();

@@ -51,7 +51,8 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
         'buyput', 'buyput_amount', 'sellput', 'sellput_amount', 'putdiff', 'putdiff_amount');
     $users = array(1, 2, 3, 1, 2, 3); // 1:'自營商', 2:'投信', 3:'外資'
     $trades = $contracts = array();
-    if (count($table)) {
+    $page_time = strtotime(str_replace('/', '-', $pageHtml->find('#datestart', 0)->value));
+    if (count($table) and $time == $page_time) {
         echo date('Y/m/d', $time) . 'ok' . PHP_EOL;
         // 3 ~ 9 的 tr 正好是，三大法人
         for ($i = 3; $i < 9; $i++) {

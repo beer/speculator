@@ -21,6 +21,22 @@ class OptionContractRow extends Pix_Table_Row
             }
         }
     }
+
+    public function amount($field)
+    {
+        return number_format($this->{"{$field}_amount"});
+    }
+
+    public function point($field)
+    {
+        $field_amount = "{$field}_amount";
+        return intval($this->{$field_amount}*1000/$this->{$field}/50);
+    }
+
+    public function detail($field)
+    {
+        return '契約金額:' . $this->amount($field) . '  平均點數:' . $this->point($field);
+    }
 }
 
 class OptionContract extends SpeculatorTable

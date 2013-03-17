@@ -32,15 +32,15 @@ if (sizeof($future_1)) {
 <tr <?= ($this->bgColor) ? 'class="day_background"' : ''?>>
     <td></td>
     <td style="color:#FF0000">台指買權</td>
-    <td title="<?='契約金額:' . number_format($option_3->buycall_amount) . '  平均點數:' . $option_3->buycall_amount*1000/$option_3->buycall/50; ?>"><?= $option_3->buycall; ?></td>
-    <td><?= $option_3->sellcall; ?></td>
+    <td title="<?=$option_3->detail('buycall'); ?>"><?= $option_3->buycall; ?></td>
+    <td title="<?=$option_3->detail('sellcall'); ?>"><?= $option_3->sellcall; ?></td>
     <td><?= $option_3->buycall - $option_3_yestoday->buycall; ?></td>
     <td><?= $option_3->sellcall - $option_3_yestoday->sellcall; ?></td>
     <td><?= $option_3->buycall - $option_3->sellcall ?></td>
     <?php $outside_otp_buy = ($option_3->buycall - $option_3->sellcall) - ($option_3_yestoday->buycall - $option_3_yestoday->sellcall);?>
     <td style="color:#<?= ($outside_otp_buy > 0) ? 'FF0000' : '00FF00'?>"><?= $outside_otp_buy ?></td>
-    <td><?= $option_1->buycall; ?></td>
-    <td><?= $option_1->sellcall; ?></td>
+    <td title="<?=$option_1->detail('buycall'); ?>"><?= $option_1->buycall; ?></td>
+    <td title="<?=$option_1->detail('sellcall'); ?>"><?= $option_1->sellcall; ?></td>
     <td><?= $option_1->buycall - $option_1_yestoday->buycall; ?></td>
     <td><?= $option_1->sellcall - $option_1_yestoday->sellcall; ?></td>
     <td><?= $option_1->buycall - $option_1->sellcall ?></td>
@@ -50,15 +50,15 @@ if (sizeof($future_1)) {
 <tr <?= ($this->bgColor) ? 'class="day_background"' : ''?>>
     <td></td>
     <td style="color:#00FF00">台指賣權</td>
-    <td><?= $option_3->buyput; ?></td>
-    <td><?= $option_3->sellput; ?></td>
+    <td title="<?=$option_3->detail('buyput'); ?>"><?= $option_3->buyput; ?></td>
+    <td title="<?=$option_3->detail('sellput'); ?>"><?= $option_3->sellput; ?></td>
     <td><?= $option_3->buyput - $option_3_yestoday->buyput; ?></td>
     <td><?= $option_3->sellput - $option_3_yestoday->sellput; ?></td>
     <td><?= $option_3->buyput - $option_3->sellput ?></td>
     <?php $outside_otp_sell = ($option_3->buyput - $option_3->sellput) - ($option_3_yestoday->buyput - $option_3_yestoday->sellput);?>
     <td style="color:#<?= ($outside_otp_sell < 0) ? 'FF0000' : '00FF00'?>"><?= $outside_otp_sell ?></td>
-    <td><?= $option_1->buyput; ?></td>
-    <td><?= $option_1->sellput; ?></td>
+    <td title="<?=$option_1->detail('buyput'); ?>"><?= $option_1->buyput; ?></td>
+    <td title="<?=$option_1->detail('sellput'); ?>"><?= $option_1->sellput; ?></td>
     <td><?= $option_1->buyput - $option_1_yestoday->buyput; ?></td>
     <td><?= $option_1->sellput - $option_1_yestoday->sellput; ?></td>
     <td><?= $option_1->buyput - $option_1->sellput ?></td>

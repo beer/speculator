@@ -3,7 +3,7 @@ class AjaxController extends Pix_Controller
 {
     public function twiiAction()
     {
-        $candles = Candle::search(1);
+        $candles = Candle::search(1)->order('time ASC');
         $data = array();
         foreach ($candles as $c) {
             // UTC+8

@@ -1,10 +1,13 @@
 <?php
 include(__DIR__ . '/../webdata/init.inc.php');
-$time = strtotime('2013-3-3');
+echo date('Y/m/d', 1361548800);
+exit;
+$time = strtotime('2013-02-23');
 $rows = Candle::search(array('time' => $time));
 if (sizeof($rows)) {
     $rows->delete();
 }
+/*
 $rows = FutureContract::search(array('date' => $time));
 if (sizeof($rows)) {
     $rows->delete();
@@ -21,3 +24,4 @@ $rows = OptionTrade::search(array('date' => $time));
 if (sizeof($rows)) {
     $rows->delete();
 }
+ */

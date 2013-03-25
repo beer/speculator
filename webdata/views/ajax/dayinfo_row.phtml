@@ -14,15 +14,15 @@ if (sizeof($future_1)) {
 <tr <?= ($this->bgColor) ? 'class="day_background"' : ''?>>
     <td><?= date('Y/m/d', $today); ?></td>
     <td style="color:#0000FF">台指期貨</td>
-    <td><?= $future_3->buy; ?></td>
-    <td><?= $future_3->sell; ?></td>
+    <td title="<?=$future_3->detail('buy'); ?>"><?= $future_3->buy; ?></td>
+    <td title="<?=$future_3->detail('sell'); ?>"><?= $future_3->sell; ?></td>
     <td><?= $future_3->buy - $future_3_yestoday->buy; ?></td>
     <td><?= $future_3->sell - $future_3_yestoday->sell; ?></td>
     <td><?= $future_3->buy - $future_3->sell; ?></td>
     <?php $outside_futures = ($future_3->buy - $future_3->sell) - ($future_3_yestoday->buy - $future_3_yestoday->sell);?>
     <td style="color:#<?= ($outside_futures > 0) ? 'FF0000' : '00FF00'?>"><?= $outside_futures ?></td>
-    <td><?= $future_1->buy; ?></td>
-    <td><?= $future_1->sell; ?></td>
+    <td title="<?=$future_1->detail('buy'); ?>"><?= $future_1->buy; ?></td>
+    <td title="<?=$future_1->detail('sell'); ?>"><?= $future_1->sell; ?></td>
     <td><?= $future_1->buy - $future_1_yestoday->buy; ?></td>
     <td><?= $future_1->sell - $future_1_yestoday->sell; ?></td>
     <td><?= $future_1->buy - $future_1->sell; ?></td>

@@ -28,7 +28,8 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
     }
 
     // 選擇權資料
-    $url = 'http://www.taifex.com.tw/chinese/3/7_12_5.asp';/*{{{*/
+    #$url = 'http://www.taifex.com.tw/chinese/3/7_12_5.asp';/*{{{*/
+    $url = 'http://60.250.19.171/chinese/3/7_12_5.asp';/*{{{*/
     $fields = array(
         'DATA_DATE_Y' => date('Y', $time),
         'DATA_DATE_M' => date('n', $time),

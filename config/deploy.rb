@@ -14,7 +14,7 @@ set :repository, "git@github.com:beer/speculator.git"
 #set :git_enable_submodules, 1
 #set :scm_passphrase, ""
 
-set :user, "beer"
+set :user, "deploy"
 set :use_sudo, false
 
 #role :app, "speculator.im"

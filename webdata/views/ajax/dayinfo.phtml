@@ -25,6 +25,7 @@ table#dayinfo td {
 </style>
 <?php
 $day = $yestoday = $this->day;
+
 while ($yestoday = $yestoday - 86400) {
     $row = FutureContract::search(array('date' => $yestoday));
     if (sizeof($row)) {

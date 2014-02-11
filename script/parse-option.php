@@ -23,7 +23,13 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
             'type' => 'TXO', 
             'user_id' => 1
         ));
-    if (count($rows)) {
+    $rows2 = OptionContract::search(
+        array(
+            'date' => $time, 
+            'type' => 'TXO', 
+            'user_id' => 1
+        ));
+    if (count($rows) and count($rows2)) {
         continue;
     }
 

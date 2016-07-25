@@ -7,12 +7,9 @@ $url = 'http://www.twse.com.tw/ch/trading/indices/MI_5MINS_HIST/MI_5MINS_HIST.ph
 
 //$years = array(88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102);
 //$years = array(103);
-/*
 $now = time();
 $this_year = date('Y', $now);
 $years = array($this_year);
- */
-$years = array(103);
 $monthes = array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12');
 
 

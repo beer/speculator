@@ -10,6 +10,10 @@ class CandleRow extends Pix_Table_Row
     {
         $this->updated_at = time();
     }
+
+    public function getTicks()
+    {
+    }
 }
 
 class Candle extends SpeculatorTable
@@ -27,7 +31,11 @@ class Candle extends SpeculatorTable
         $this->_columns['top'] = array('type' => 'float', 'size' => 10);
         $this->_columns['low'] = array('type' => 'float', 'size' => 10);
         $this->_columns['close'] = array('type' => 'float', 'size' => 10);
+        $this->_columns['frequency'] = array('type' => 'int', 'size' => 10);
         $this->_columns['created_at'] = array('type' => 'int', 'size' => 10);
         $this->_columns['updated_at'] = array('type' => 'int', 'size' => 10);
+
+        //$this->_relations['5mins'] = array('rel' => 'has_many', 'type' => '5min', 'foreign_key' => 'date', 'delete' => true);
+
     }
 }

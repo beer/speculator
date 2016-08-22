@@ -1,6 +1,6 @@
 <?php
 include(__DIR__ . '/../webdata/init.inc.php');
-echo date('Y/m/d', 915552000);
+echo date('Y/m/d H:m', 1419782400 );
 exit;
 $time = strtotime('2013-02-23');
 $rows = Candle::search(array('time' => $time));

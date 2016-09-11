@@ -9,15 +9,17 @@ $url = 'http://www.twse.com.tw/ch/trading/indices/MI_5MINS_HIST/MI_5MINS_HIST.ph
 //$years = array(103);
 $now = time();
 // 換成民國 - 1911
-$this_year = date('Y', $now) - 1911;
+$year = date('Y', $now);
+$this_year = $year - 1911;
 $years = array($this_year);
 $monthes = array('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12');
 
 
 foreach ($years as $y) {
     foreach ($monthes as $m) {
-        // :NOTE: 未來的跳過
-        if (time() < strtotime($y . "-{$m}")) {
+        // :NOTE: 未來 & 一個月前的跳過
+        $current_time = strtotime($year . "-{$m}");
+        if ($current_time < strtotime("-2 month") or $current_time > $now) {
             continue;
         }
 

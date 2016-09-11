@@ -6,8 +6,7 @@
 include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 
-$start_date = '2015-09-10';
-$candles = Candle::search("`time` >= " . strtotime($start_date));
+$candles = Candle::search("`time` >= " . strtotime("+1 week"));
 
 foreach ($candles as $candle) {
     //echo date("Ymd", $d->time) . "\n";

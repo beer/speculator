@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    body {
+        font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+
+    path {
+        fill: none;
+        stroke-width: 1;
+    }
+
+    path.candle {
+        stroke: #000000;
+    }
+
+    path.candle.body {
+        stroke-width: 1;
+    }
+
+    path.candle.down {
+        fill: #00AA00;
+        stroke: #000000;
+    }
+
+    path.candle.up {
+        fill: #FF0000;
+        stroke: #000000;
+    }
+
+    path.volume {
+        fill: #DDDDDD;
+    }
+
+    .mouseover .supstance path, .mouseover .suptance1 path {
+        stroke-width: 1.5;
+    }
+
+    .supstance path {
+        stroke: blue;
+        stroke-width: 0.8;
+        stroke-dasharray: 2, 2;
+    }
+
+    .supstance1 path {
+        stroke: brown;
+        stroke-width: 0.8;
+        stroke-dasharray: 2, 2;
+    }
+
+    .axisannotation path {
+        fill: blue;
+    }
+
+    .axisannotation text {
+        fill: #fff;
+    }
+
+    .dragging .supstance path {
+        stroke: darkblue;
+    }
+
+    .dragging .supstance1 path {
+        stroke: darkbrown;
+    }
+
+    .interaction path {
+        pointer-events: all;
+        cursor: ns-resize;
+        stroke: blue;
+        stroke-width: 1;
+    }
+
+    .y.annotation path {
+        fill: #FF0000;
+    }
+
+    .x.annotation path {
+        fill: #DDD80E;
+    }
+
+    .crosshair {
+        cursor: crosshair;
+    }
+
+    .crosshair path.wire {
+        stroke: red;
+        stroke-dasharray: 1, 1;
+    }
+
+    .crosshair .axisannotation path {
+        fill: orange;
+    }
+
+    .crosshair .axisannotation text {
+        fill: black;
+    }
+
+    .ma-0 path.line {
+        stroke: #ff7f0e;
+    }
+
+    .bollinger path {
+        stroke: #00b8e6;
+    }
+
+    .bollinger path.upper , .bollinger path.lower{
+        stroke-width: 1.2;
+    }
+    
+    button.btn1{
+        position: absolute;
+        right: 280px;
+        top: 25px;
+    }
+
+    button.btn2{
+        position: absolute;
+        right: 280px;
+        top: 45px;
+    }
+
+    button.btn3{
+        position: absolute;
+        right: 280px;
+        top: 65px;
+    }
+
+    button.btn4{
+        position: absolute;
+        right: 280px;
+        top: 85px;
+    }
+
+</style>
+<body>
+<div id="info"></div>
+<button class="btn1">二分一線</button>
+<button class="btn2">布林通道</button>
+<button class="btn3">簡單均線</button>
+<button class="btn4">成 交 量</button>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="/webroot/js/d3/d3.tip.v0.6.3.js"></script>
+<script src="http://techanjs.org/techan.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<link rel="stylesheet" href="/webroot/css/d3/d3-tip.css">
+<script>
+
+    var weeks = ['日', '一', '二', '三', '四', '五', '六'];
+    var tip = d3.tip().attr('class', 'd3-tip w').html(function(d, i) {
+            return timeAnnotation.format()(d.date) + ' (' +
+                   weeks[d3.time.format('%w')(d.date)]+')<br/>' +
+            //return '<b>'+ d.date.toString('yyyy/MM/dd(') + weeks[] +')</b><br/>'
+                   '開盤: ' + d.open + '<br/>' +
+                   '最高: ' + d.high + '<br/>' +
+                   '最底: ' + d.low + '<br/>' +
+                   '收盤: ' + d.close + '<br/>' +
+                   '均價: ' + ((d.high + d.low)/2).toFixed(2) + '<br/>' +
+                   '成交量: ' + d.volume.toFixed(0) + '億<br/>';
+        });
+
+    var activeMoietyLine = 1,
+            activeBollinger = 1,
+            activeSma = 1,
+            activeVolume = 1;
+
+    var margin = {top: 20, right: 90, bottom: 30, left: 50},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+
+    var parseDate = d3.time.format("%d-%b-%y").parse,
+            valueFormat = d3.format(',.2fs');
+
+    var x = techan.scale.financetime()
+            .range([0, width - 10]);
+
+    var y = d3.scale.linear()
+            .range([height, 0]);
+
+    var percent = y.copy();
+
+    var yVolume = d3.scale.linear()
+            .range([y(0), y(0.2)]);
+
+    var candlestick = techan.plot.candlestick()
+            .xScale(x)
+            .yScale(y);
+
+    var sma = techan.plot.sma()
+            .xScale(x)
+            .yScale(y);
+
+    var volume = techan.plot.volume()
+            .accessor(candlestick.accessor())
+            .xScale(x)
+            .yScale(yVolume);
+
+    var bollinger = techan.plot.bollinger()
+            .xScale(x)
+            .yScale(y);
+
+    var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+    var percentAxis = d3.svg.axis()
+            .scale(percent)
+            .orient("right");
+
+    var yRightAxis = d3.svg.axis()
+            .scale(y)
+            .orient("right");
+
+    var volumeAxis = d3.svg.axis()
+            .scale(yVolume)
+            .orient("right")
+            .ticks(3)
+            .tickFormat(d3.format(",.2fs"));
+
+    var volumeAnnotation = techan.plot.axisannotation()
+            .axis(volumeAxis)
+            .width(35);
+
+    var ohlcAnnotation = techan.plot.axisannotation()
+            .axis(yAxis)
+            .format(d3.format(',.2fs'));
+
+    var ohlcRightAnnotation = techan.plot.axisannotation()
+            .axis(yRightAxis)
+            .translate([width, 0])
+            .format(d3.format(',.2fs'));
+
+    var timeAnnotation = techan.plot.axisannotation()
+            .axis(xAxis)
+            .format(d3.time.format('%Y-%m-%d'))
+            .width(65)
+            .translate([0, height]);
+
+    var percentAnnotation = techan.plot.axisannotation()
+            .axis(percentAxis)
+            .format(d3.format('+.1%'));
+
+    var crosshair = techan.plot.crosshair()
+            .xScale(x)
+            .yScale(y)
+            .xAnnotation([timeAnnotation])
+            .yAnnotation([ohlcAnnotation, volumeAnnotation])
+            .on("enter", crossEnter)
+            .on("out", crossOut)
+            .on("move", crossMove);
+
+    var supstanceX = x.copy()
+            .range([0, width + 10]);
+
+    var supstance = techan.plot.supstance()
+            .xScale(supstanceX)
+            .yScale(y)
+            //.annotation([ohlcAnnotation, percentAnnotation])
+            .annotation([ohlcRightAnnotation])
+            .on("mouseenter", enter)
+            .on("mouseout", out)
+            .on("drag", drag);
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+
+    var defs = svg.append("defs");
+
+    defs.append("clipPath")
+            .attr("id", "ohlcClip")
+        .append("rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", width)
+            .attr("height", height);
+
+    defs.append("clipPath")
+            .attr("id", "supstanceClip")
+        .append("rect")
+            .attr("x", -margin.left)
+            .attr("y", 0)
+            .attr("width", width+margin.left)
+            .attr("height", height);
+
+    svg = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var valueText = svg.append('text')
+            .style("text-anchor", "end")
+            .attr("class", "coords")
+            .attr("x", width - 5)
+            .attr("y", 5);
+
+    var coordsText = svg.append('text')
+            .style("text-anchor", "end")
+            .attr("class", "coords")
+            .attr("x", width - 5)
+            .attr("y", 15);
+
+
+    d3.json("http://beer.test.speculator.pivmi.info/ajax/d3candle", function(error, data) {
+        var accessor = candlestick.accessor();
+
+        data = data.map(function(d) {
+            return {
+                date: parseDate(d[0]),
+                open: +d[1],
+                high: +d[2],
+                low: +d[3],
+                close: +d[4],
+                volume: +d[5]
+            };
+        }).sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
+
+        var minY = d3.min(data, function(d){return d.low});
+        var maxY = d3.max(data, function(d){return d.high});
+        
+        // blue line
+        var interval = (maxY - minY)/8;
+        var supstanceData = [
+            { type: "最大壓力線", value: maxY },
+            { value: minY + interval*7},
+            { value: minY + interval*6},
+            { value: minY + interval*5},
+            { type: "主要中線", value: minY + interval*4 },
+            { value: minY + interval*3 },
+            { value: minY + interval*2 },
+            { value: minY + interval*1 },
+            { type: "最大支撐線", value: minY }
+        ];
+
+        // brown line
+        var minY1 = minY + interval/2;
+        var supstanceData1 = [
+            { value: minY1 + interval*7},
+            { value: minY1 + interval*6},
+            { value: minY1 + interval*5},
+            { value: minY1 + interval*4 },
+            { value: minY1 + interval*3 },
+            { value: minY1 + interval*2 },
+            { value: minY1 + interval*1 },
+            { value: minY1 }
+        ];
+
+        x.domain(data.map(accessor.d));
+        y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+        //percent.domain(techan.scale.plot.percent(y, accessor(data[0])).domain());
+        yVolume.domain(techan.scale.plot.volume(data).domain());
+
+        svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+        svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Price ($)");
+
+        svg.append("g")
+                .datum(data)
+                .attr("class", "volume")
+                .attr("clip-path", "url(#ohlcClip)")
+                .call(volume);
+
+        svg.append("g")
+                .datum(data)
+                .attr("class", "candlestick")
+                .call(candlestick);
+
+        // supstance 放在 crosshair 之下，移動功能就不會被蓋掉
+        svg.append("g")
+                .datum(supstanceData)
+                .attr("class", "supstance")
+                .call(supstance)
+                .call(supstance.drag)
+
+        svg.append("g")
+                .datum(supstanceData1)
+                .attr("class", "supstance1")
+                .call(supstance)
+                .call(supstance.drag);
+
+        svg.append('g')
+                .attr("class", "crosshair")
+                .call(crosshair);
+
+        svg.append("g")
+                .attr("class", "indicator sma ma-0")
+                .attr("clip-path", "url(#ohlcClip)")
+                .datum(techan.indicator.sma().period(10)(data))
+                .call(sma);
+
+        svg.append("g")
+                .attr("class", "indicator bollinger")
+                .attr("clip-path", "url(#ohlcClip)")
+                .datum(techan.indicator.bollinger()(data))
+                .call(bollinger);
+
+        svg.append("g")
+                .attr("class", "volume axis")
+                .call(volumeAxis);
+
+        var bars = svg.selectAll(".bar").data(data).enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("width", '4px')
+                .attr("x", function(d) { return x(d.date) - 1; })
+                .attr("y", function(d, i) {
+                    if((y(d.close)-y(d.open)) < 0){
+                        return (y(d.close));
+                    }
+                    return y(d.open);
+                })
+                .attr("height", function(d) {
+                    if((y(d.close)-y(d.open)) < 0){
+                        return (-1)*((y(d.close)-y(d.open)));
+                    }
+                    return (y(d.close)-y(d.open));
+                })
+                .attr("opacity", '0.12')
+                .on('mouseover',tip.show).on('mouseout', tip.hide)
+                .on('mousedown', getDayInfo);
+
+        svg.call(tip);
+        
+        d3.select(".btn1").on("click", switchMoietyLine);
+        d3.select(".btn2").on("click", switchBollinger);
+        d3.select(".btn3").on("click", switchSma);
+        d3.select(".btn4").on("click", switchVolume);
+
+    });
+
+    function enter(d) {
+        valueText.style("display", "inline");
+        refreshText(d);
+    }
+
+    function out() {
+        valueText.style("display", "none");
+    }
+
+    function crossEnter(d) {
+        valueText.style("display", "inline");
+    }
+
+    function crossOut() {
+        valueText.style("display", "none");
+    }
+
+    function drag(d) {
+        refreshText(d);
+    }
+
+    function refreshText(d) {
+        var lineType = d.type ? d.type : '警示線/敏感線'; 
+        valueText.text(
+            lineType + ": " +valueFormat(d.value)
+        );
+    }
+
+    function crossMove(coords) {
+        valueText.text(
+            timeAnnotation.format()(coords.x) + ", " + ohlcAnnotation.format()(coords.y)
+        );
+    }
+
+    function getDayInfo(d) {
+        $.post('/ajax/getDayInfo', {day: timeAnnotation.format()(d.date)}, 
+                function(response) {
+                    if (!response.error) {
+                        $('#info').html(response.content);
+                        console.log(response.content);
+                    }
+                });
+    }
+
+    function switchMoietyLine(d) {
+        if (activeMoietyLine) {
+            svg.select('g.supstance').style("display", 'none');
+            svg.select('g.supstance1').style("display", 'none');
+            activeMoietyLine = 0;
+        } else {
+            svg.select('g.supstance').style("display", 'inline');
+            svg.select('g.supstance1').style("display", 'inline');
+            activeMoietyLine = 1;
+        }
+    }
+
+    function switchBollinger(d) {
+        if (activeBollinger) {
+            svg.select('g.bollinger').style("display", 'none');
+            activeBollinger = 0;
+        } else {
+            svg.select('g.bollinger').style("display", 'inline');
+            activeBollinger = 1;
+        }
+    }
+
+    function switchSma(d) {
+        if (activeSma) {
+            svg.select('g.sma').style("display", 'none');
+            activeSma = 0;
+        } else {
+            svg.select('g.sma').style("display", 'inline');
+            activeSma = 1;
+        }
+    }
+
+    function switchVolume(d) {
+        if (activeVolume) {
+            svg.select('g.volume').style("display", 'none');
+            svg.select('g.volume.axis').style("display", 'none');
+            activeVolume = 0;
+        } else {
+            svg.select('g.volume').style("display", 'inline');
+            svg.select('g.volume.axis').style("display", 'inline');
+            activeVolume = 1;
+        }
+    }
+</script>

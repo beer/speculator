@@ -25,11 +25,13 @@ class AjaxController extends Pix_Controller
 
     public function d3candleAction()
     {
-        $candles = Candle::search(1)->order('time ASC');
+        //$candles = Candle::search(1)->order('time ASC')->limit(200);
+        $candles = Candle::search('`time` > ' . strtotime('2016-01-01'))->order('time ASC')->limit(200);
         $data = array();
         foreach ($candles as $c) {
             // UTC+8
-            $data[] = array($c->time * 1000 + 28800*1000, (float) $c->open, (float) $c->top, (float) $c->low, (float) $c->close);
+            // volume 單位用(億)表示
+            $data[] = array(date('d-M-y', $c->time), (float) $c->open, (float) $c->top, (float) $c->low, (float) $c->close, (float) $c->volume / 100000000);
         }
         $this->json($data);
     }

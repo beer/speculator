@@ -6,6 +6,16 @@ class IndexController extends Pix_Controller
 
     }
 
+    public function moietyAction()
+    {
+
+    }
+
+    public function testAction()
+    {
+
+    }
+
     public function twiiAction()
     {
         $candles = Candle::search(1);

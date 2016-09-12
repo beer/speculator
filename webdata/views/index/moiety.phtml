@@ -40,6 +40,12 @@
         fill: #DDDDDD;
     }
 
+    .extent {
+        stroke: #fff;
+        fill-opacity: .125;
+        shape-rendering: crispEdges;
+    }
+
     .mouseover .supstance path, .mouseover .suptance1 path {
         stroke-width: 1.5;
     }
@@ -108,6 +114,10 @@
         stroke: #ff7f0e;
     }
 
+    .close path.line {
+        stroke: #00b8e6;
+    }
+
     .bollinger path {
         stroke: #00b8e6;
     }
@@ -172,24 +182,35 @@
             activeSma = 1,
             activeVolume = 1;
 
-    var margin = {top: 20, right: 90, bottom: 30, left: 50},
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+    var margin = {top: 20, right: 90, bottom: 100, left: 50},
+        margin2 = {top: 420, right: 90, bottom: 20, left: 50},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom,
+        height2 = 500 - margin2.top - margin2.bottom;
 
 
     var parseDate = d3.time.format("%d-%b-%y").parse,
-            valueFormat = d3.format(',.2fs');
+        valueFormat = d3.format(',.2fs');
 
     var x = techan.scale.financetime()
+            .range([0, width - 10]);
+
+    var x2= techan.scale.financetime()
             .range([0, width - 10]);
 
     var y = d3.scale.linear()
             .range([height, 0]);
 
+    var y2 = d3.scale.linear()
+            .range([height2, 0]);
+
     var percent = y.copy();
 
     var yVolume = d3.scale.linear()
             .range([y(0), y(0.2)]);
+
+    var brush = d3.svg.brush()
+            .on("brushend", draw);
 
     var candlestick = techan.plot.candlestick()
             .xScale(x)
@@ -208,12 +229,25 @@
             .xScale(x)
             .yScale(y);
 
+    var close = techan.plot.close()
+            .xScale(x2)
+            .yScale(y2);
+
     var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom");
 
+    var xAxis2 = d3.svg.axis()
+            .scale(x2)
+            .orient("bottom");
+
     var yAxis = d3.svg.axis()
             .scale(y)
+            .orient("left");
+
+    var yAxis2 = d3.svg.axis()
+            .scale(y2)
+            .ticks(0)
             .orient("left");
 
     var percentAxis = d3.svg.axis()
@@ -278,6 +312,28 @@
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom);
 
+    var focus = svg.append("g")
+            .attr("class", "focus")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    focus.append("clipPath")
+            .attr("id", "clip")
+        .append("rect")
+            .attr("x", 0)
+            .attr("y", y(1))
+            .attr("width", width)
+            //.attr("height", height);
+            .attr("height", y(0) - y(1));
+
+    focus.append("clipPath")
+            .attr("id", "supstanceClip")
+        .append("rect")
+            .attr("x", -margin.left)
+            .attr("y", 0)
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height);
+
+    /*
     var defs = svg.append("defs");
 
     defs.append("clipPath")
@@ -298,22 +354,98 @@
 
     svg = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    */
 
-    var valueText = svg.append('text')
+    var valueText = focus.append('text')
             .style("text-anchor", "end")
             .attr("class", "coords")
             .attr("x", width - 5)
             .attr("y", 5);
 
-    var coordsText = svg.append('text')
+    var coordsText = focus.append('text')
             .style("text-anchor", "end")
             .attr("class", "coords")
             .attr("x", width - 5)
             .attr("y", 15);
 
+    focus.append("g")
+            .attr("class", "volume")
+            .attr("clip-path", "url(#clip)");
+
+    focus.append("g")
+            .attr("class", "candlestick")
+            .attr("clip-path", "url(#clip)");
+
+    focus.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")");
+
+    focus.append("g")
+            .attr("class", "volume axis");
+            //.call(volumeAxis);
+
+    focus.append("g")
+            .attr("class", "y axis")
+        .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Price ($)");
+
+    focus.append("g")
+            //.datum(supstanceData)
+            .attr("class", "supstance")
+            .attr("clip-path", "url(#supstanceClip)");
+            //.call(supstance)
+            //.call(supstance.drag);
+
+    focus.append("g")
+            //.datum(supstanceData1)
+            .attr("class", "supstance1")
+            .attr("clip-path", "url(#supstanceClip)");
+            //.call(supstance)
+            //.call(supstance.drag);
+
+    focus.append('g')
+            .attr("class", "crosshair")
+            .call(crosshair);
+
+    focus.append("g")
+            .attr("class", "indicator sma ma-0")
+            .attr("clip-path", "url(#clip)");
+            //.datum(techan.indicator.sma().period(10)(data))
+            //.call(sma);
+
+    focus.append("g")
+            .attr("class", "indicator bollinger")
+            .attr("clip-path", "url(#clip)")
+            //.datum(techan.indicator.bollinger()(data))
+            //.call(bollinger);
+
+    var context = svg.append("g")
+            .attr("class", "context")
+            .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+    context.append("g")
+            .attr("class", "close");
+
+    context.append("g")
+            .attr("class", "pane");
+
+    context.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height2 + ")");
+
+    context.append("g")
+            .attr("class", "y axis")
+            .call(yAxis2);
+
+    var zoomable, zoomable2;
 
     d3.json("http://beer.test.speculator.pivmi.info/ajax/d3candle", function(error, data) {
         var accessor = candlestick.accessor();
+            timestart = Date.now();
 
         data = data.map(function(d) {
             return {
@@ -357,70 +489,23 @@
         ];
 
         x.domain(data.map(accessor.d));
+        x2.domain(x.domain());
         y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+        y2.domain(y.domain());
         //percent.domain(techan.scale.plot.percent(y, accessor(data[0])).domain());
         yVolume.domain(techan.scale.plot.volume(data).domain());
 
-        svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
+        focus.select("g.candlestick").datum(data);
+        focus.select("g.volume").datum(data);
+        focus.select("g.indicator.sma").datum(techan.indicator.sma().period(10)(data));
+        focus.select("g.indicator.bollinger").datum(techan.indicator.bollinger()(data));
+        focus.select("g.supstance").datum(supstanceData);
+        focus.select("g.supstance1").datum(supstanceData1);
 
-        svg.append("g")
-                .attr("class", "y axis")
-                .call(yAxis)
-                .append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 6)
-                .attr("dy", ".71em")
-                .style("text-anchor", "end")
-                .text("Price ($)");
+        context.select("g.close").datum(data).call(close);
+        context.select("g.x.axis").call(xAxis2);
 
-        svg.append("g")
-                .datum(data)
-                .attr("class", "volume")
-                .attr("clip-path", "url(#ohlcClip)")
-                .call(volume);
-
-        svg.append("g")
-                .datum(data)
-                .attr("class", "candlestick")
-                .call(candlestick);
-
-        // supstance 放在 crosshair 之下，移動功能就不會被蓋掉
-        svg.append("g")
-                .datum(supstanceData)
-                .attr("class", "supstance")
-                .call(supstance)
-                .call(supstance.drag)
-
-        svg.append("g")
-                .datum(supstanceData1)
-                .attr("class", "supstance1")
-                .call(supstance)
-                .call(supstance.drag);
-
-        svg.append('g')
-                .attr("class", "crosshair")
-                .call(crosshair);
-
-        svg.append("g")
-                .attr("class", "indicator sma ma-0")
-                .attr("clip-path", "url(#ohlcClip)")
-                .datum(techan.indicator.sma().period(10)(data))
-                .call(sma);
-
-        svg.append("g")
-                .attr("class", "indicator bollinger")
-                .attr("clip-path", "url(#ohlcClip)")
-                .datum(techan.indicator.bollinger()(data))
-                .call(bollinger);
-
-        svg.append("g")
-                .attr("class", "volume axis")
-                .call(volumeAxis);
-
-        var bars = svg.selectAll(".bar").data(data).enter()
+        var bars = focus.selectAll(".bar").data(data).enter()
                 .append("rect")
                 .attr("class", "bar")
                 .attr("width", '4px')
@@ -441,14 +526,43 @@
                 .on('mouseover',tip.show).on('mouseout', tip.hide)
                 .on('mousedown', getDayInfo);
 
-        svg.call(tip);
-        
+        // Associate the brush with the scale and render the brush only AFTER a domain has been applied
+        zoomable = x.zoomable();
+        zoomable2 = x2.zoomable();
+        brush.x(zoomable2);
+        context.select("g.pane").call(brush).selectAll("rect").attr("height", height2);
+
+        draw();
+
         d3.select(".btn1").on("click", switchMoietyLine);
         d3.select(".btn2").on("click", switchBollinger);
         d3.select(".btn3").on("click", switchSma);
         d3.select(".btn4").on("click", switchVolume);
 
+        console.log("Render time: " + (Date.now()-timestart));
+
     });
+
+    function draw() {
+        var candlestickSelection = focus.select("g.candlestick"),
+            data = candlestickSelection.datum();
+        zoomable.domain(brush.empty() ? zoomable2.domain() : brush.extent());
+        y.domain(techan.scale.plot.ohlc(data.slice.apply(data, zoomable.domain()), candlestick.accessor()).domain());
+        candlestickSelection.call(candlestick);
+        focus.select("g.volume").call(volume);
+        focus.select("g.indicator.sma").call(sma);
+        focus.select("g.indicator.bollinger").call(bollinger);
+        focus.select("g.supstance").call(supstance);
+        focus.select("g.supstance1").call(supstance);
+        // using refresh method is more efficient as it does not perform any data joins
+        // Use this if underlying data is not changing
+//        svg.select("g.candlestick").call(candlestick.refresh);
+        focus.select("g.x.axis").call(xAxis);
+        focus.select("g.y.axis").call(yAxis);
+        focus.select("g.volume.axis").call(volumeAxis);
+
+        focus.call(tip);
+    }
 
     function enter(d) {
         valueText.style("display", "inline");

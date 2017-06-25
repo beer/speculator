@@ -26,7 +26,7 @@ class AjaxController extends Pix_Controller
     public function d3candleAction()
     {
         //$candles = Candle::search(1)->order('time ASC')->limit(200);
-        $candles = Candle::search('`time` > ' . strtotime('2016-10-01'))->order('time ASC');
+        $candles = Candle::search('`time` > ' . strtotime('2016-06-01'))->order('time ASC');
         $data = array();
         foreach ($candles as $c) {
             // UTC+8

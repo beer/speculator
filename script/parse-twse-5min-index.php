@@ -4,7 +4,8 @@ include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 
 //$candles = Candle::search("`time` < " . strtotime('2004-10-15') . " AND `time` >= " . strtotime('2004-03-19'));
-$candles = Candle::search("`time` >= " . strtotime("-1 week"));
+//$candles = Candle::search("`time` >= " . strtotime("-1 week"));
+$candles = Candle::search("`time` >= " . strtotime('2017-1-5'));
 
 foreach ($candles as $candle) {
     //echo date("Ymd", $d->time) . "\n";
@@ -90,6 +91,7 @@ foreach ($candles as $candle) {
         $candle->save();
         echo date("Ymd", $candle->time) . "\n";
         echo $title . PHP_EOL;
+        echo count($candles) . " 在這就會被kill ? \n";
     } else {
         echo $candle->time . ' == ' . strtotime($matches['year'] + 1911 . "-{$matches['month']}-{$matches['day']}") . ' ??  ' . PHP_EOL;
         $error_msg = date("Ymd", $candle->time) . "內容抓取不對:{$title}\n";
@@ -98,3 +100,4 @@ foreach ($candles as $candle) {
     }
     //echo count($dates);
 }
+echo count($candles) . '\n';

@@ -6,7 +6,13 @@
 include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 
-$candles = Candle::search("`time` >= " . strtotime("-1 week"));
+$now = time();
+$msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
+StdLib::log($msg);
+
+
+//$candles = Candle::search("`time` >= " . strtotime("-4 week"));
+$candles = Candle::search("`time` >= " . strtotime("2017/01/16"));
 
 foreach ($candles as $candle) {
     //echo date("Ymd", $d->time) . "\n";
@@ -59,9 +65,11 @@ foreach ($candles as $candle) {
         $volume = $trs[114]->find('td', 1)->plaintext;
     } elseif (count($trs) == 124) {
         $volume = $trs[116]->find('td', 1)->plaintext;
+    } elseif (count($trs) == 135) {
+        $volume = $trs[127]->find('td', 1)->plaintext;
     } else {
         echo count($trs) . PHP_EOL;
-        $volume = $trs[114]->find('td', 0)->plaintext;
+        $volume = $trs[127]->find('td', 0)->plaintext;
         echo "{$qdate} Volume:" . $volume . PHP_EOL;
         $error_msg = date("Ymd", $candle->time) . "資料格式不符\n";
         echo $error_msg;
@@ -73,3 +81,8 @@ foreach ($candles as $candle) {
     $candle->volume = $volume;
     $candle->save();
 }
+
+$finish_time = time();
+$msg = date("Y/m/d H:i:s", $finish_time) . " run parse-twse-volume is finished\n";
+StdLib::log($msg);
+

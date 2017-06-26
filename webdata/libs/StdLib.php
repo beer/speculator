@@ -1,6 +1,7 @@
 <?php
 class StdLib
 {
+    // 抓每月結算日時間
     public static function getClearance($diff = 0, $timestamp = null)
     {
         $now = $timestamp ? $timestamp : time();

@@ -11,8 +11,8 @@ $msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
 StdLib::log($msg);
 
 
-//$candles = Candle::search("`time` >= " . strtotime("-4 week"));
-$candles = Candle::search("`time` >= " . strtotime("2017/01/16"));
+$candles = Candle::search("`time` >= " . strtotime("-4 week"));
+//$candles = Candle::search("`time` >= " . strtotime("2017/03/28"));
 
 foreach ($candles as $candle) {
     //echo date("Ymd", $d->time) . "\n";
@@ -24,62 +24,42 @@ foreach ($candles as $candle) {
     $y = date('Y', $candle->time) - 1911;
     $m = date('m', $candle->time);
     $d = date('d', $candle->time);
-    $file = 'twse-volume.html';
-    $pass_check = false;
-    $qdate = "{$y}/{$m}/{$d}";
+    $day = date('Ymd', $candle->time);
 
-    $url = 'http://www.twse.com.tw/ch/trading/exchange/MI_INDEX/MI_INDEX.php';
-    $fields = array(
-        'qdate' => $qdate
-    );
-
-    $response = http_post_fields($url, $fields);
-    file_put_contents($file, $response);
-    $pageHtml = file_get_html($file);
-    $trs = $pageHtml->find('table tr');
-
-    if (count($trs)  == 16) {
-        $volume = $trs[15]->find('td', 1)->plaintext;
-        echo "{$qdate} Volume:" . $volume;
-    } elseif (count($trs) == 92) {
-        $volume = $trs[91]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 94 or count($trs) == 101) {
-        $volume = $trs[93]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 106) {
-        $volume = $trs[98]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 108) {
-        $volume = $trs[100]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 110) {
-        $volume = $trs[102]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 112) {
-        $volume = $trs[104]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 114) {
-        $volume = $trs[106]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 116) {
-        $volume = $trs[108]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 118) {
-        $volume = $trs[110]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 120) {
-        $volume = $trs[112]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 122) {
-        $volume = $trs[114]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 124) {
-        $volume = $trs[116]->find('td', 1)->plaintext;
-    } elseif (count($trs) == 135) {
-        $volume = $trs[127]->find('td', 1)->plaintext;
+    //$url = 'http://www.twse.com.tw/ch/trading/exchange/MI_INDEX/MI_INDEX.php';
+    $url = 'http://www.twse.com.tw/exchangeReport/MI_INDEX?response=csv&type=MS&date=';
+    $csv_url = $url . $day;
+    $csv = file_get_contents($csv_url);
+    if (!$csv) {
+        echo "Can't download csv from $csv_url \n";
     } else {
-        echo count($trs) . PHP_EOL;
-        $volume = $trs[127]->find('td', 0)->plaintext;
-        echo "{$qdate} Volume:" . $volume . PHP_EOL;
-        $error_msg = date("Ymd", $candle->time) . "資料格式不符\n";
-        echo $error_msg;
-        throw new Exception($error_msg);
-    }
-    echo "{$qdate} Volume:" . $volume;
+        file_put_contents('twse_volume_' . $day . '.csv', $csv);
+        $handle = fopen('twse_volume_' . $day . '.csv', 'r');
+        $fp = file('twse_volume_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $lines = count($fp);
+        echo "{$day}:{$lines}\n";
+        if ($lines > 143) {
+            exit;
+        }
 
-    $volume = preg_replace("/([^0-9\\.])/i", "", $volume );
-    $candle->volume = $volume;
-    $candle->save();
+        $i = 0;
+        while (($data = fgetcsv($handle)) !== FALSE) {
+            $i++;
+            if ($lines == 139 && $i == 128) {
+                $volume = $data[1];
+                break;
+            }
+            if ($lines == 143 && $i == 132) {
+                $volume = $data[1];
+                break;
+            }
+        }
+
+        echo "{$day} Volume:" . $volume . PHP_EOL;
+        $volume = preg_replace("/([^0-9\\.])/i", "", $volume );
+        $candle->volume = $volume;
+        $candle->save();
+    }
 }
 
 $finish_time = time();

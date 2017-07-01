@@ -443,7 +443,8 @@
 
     var zoomable, zoomable2;
 
-    d3.json("http://beer.test.speculator.pivmi.info/ajax/d3candle", function(error, data) {
+   // d3.json("http://beer.test.speculator.pivmi.info/ajax/d3candle", function(error, data) {
+    d3.json("/ajax/d3candle", function(error, data) {
         var accessor = candlestick.accessor();
             timestart = Date.now();
 

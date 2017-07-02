@@ -1,8 +1,10 @@
 <?php
-$fp = file('twse_20170626.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-echo count($fp);
+echo date('Y/m/d', 915465600);
+echo PHP_EOL;
 exit;
 
+$fp = file('twse_20170626.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+echo count($fp);
 $pattern = '/^(?P<year>\d+)年(?P<month>\d+)月(?P<day>\d+)日每(?P<frequency>(一分鐘|五分鐘|5|10|15))(秒)?指數*/';
 $title = '93年10月21日每一分鐘指數統計';
 preg_match($pattern, $title, $matches);

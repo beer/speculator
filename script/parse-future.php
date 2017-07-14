@@ -9,12 +9,11 @@ $today = date('Y-m-d', $now);
 $last_record_year = date('Y', $now);
 // 抓資料只確認一個月前的的
 $last_record_month = date('m', $now) - 1;
-//$last_record_month = date('m', $now);
 $last_record_day = date('d', $now);
 $last_record_timestamp = mktime(0, 0, 0, $last_record_month, $last_record_day, $last_record_year);
-//echo date('Y/m/d', $last_record_timestamp);
 
 for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
+    echo '期貨盤後：' . date('Y/m/d (D)', $time) . PHP_EOL;
     
     // 檢查是否已有資料
     $rows = FutureTrade::search(
@@ -37,29 +36,27 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
     #$url = 'http://www.taifex.com.tw/chinese/3/7_12_3.asp';/*{{{*/
     $url = 'http://60.250.19.171/chinese/3/7_12_3.asp';/*{{{*/
     $fields = array(
+        'goday' => '',
         'DATA_DATE_Y' => date('Y', $time),
-        'DATA_DATE_M' => date('n', $time),
-        'DATA_DATE_D' => date('j', $time),
+        'DATA_DATE_M' => date('m', $time),
+        'DATA_DATE_D' => date('d', $time),
         'COMMODITY_ID' => 'TXF',
         'syear' => date('Y', $time),
-        'smonth' => date('n', $time),
-        'sday' => date('j', $time),
-        'datestart' => date('Y/n/j', $time)
+        'smonth' => date('m', $time),
+        'sday' => date('d', $time),
+        'datestart' => date('Y/m/d', $time),
+        'COMMODITY_ID' => ''
     );
 
-
-    $response = http_post_fields($url, $fields);
-    $file = 'taifex-futures.html';
-    file_put_contents($file, $response);
-    $pageHtml = file_get_html($file);
+    $response = Helper::http_post_fields($url, $fields);
+    $pageHtml = str_get_html($response);
 
     $table = $pageHtml->find('.table_f');
-    echo '期';
     $columns = array('buy', 'buy_amount', 'sell', 'sell_amount', 'diff', 'diff_amount', 'buy', 'buy_amount', 'sell', 'sell_amount', 'diff', 'diff_amount',);
     $users = array('', '自營商', '投信', '外資');
     $page_time = strtotime(str_replace('/', '-', $pageHtml->find('#datestart', 0)->value));
+    echo '抓取資料日期：' . $pageHtml->find('#datestart', 0)->value;
     if (count($table) and $time == $page_time) {
-        echo date('Y/m/d', $time) . 'ok' . PHP_EOL;
         // 3 ~ 6 的 tr 正好是，三大法人
         for ($i = 3; $i < 6; $i++) {
             $tds = $pageHtml->find('.table_f tr', $i)->find('td');
@@ -98,9 +95,8 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
             }
             echo PHP_EOL;
         }
-        rename($file, 'taifex-futures-' . date('Y-m-d', $time) . '.html');
     } else {
-        echo date('Y/m/d', $time) . 'no' . PHP_EOL;
+        echo ' 休盤日或資料日期不正確' . PHP_EOL;
     }
     /*}}}*/
 }

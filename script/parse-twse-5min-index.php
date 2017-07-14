@@ -7,11 +7,11 @@ ini_set('default_socket_timeout', 300); // slow server work run solution
 $url = 'http://www.twse.com.tw/exchangeReport/MI_5MINS_INDEX?response=csv&date=';
 
 //$candles = Candle::search("`time` < " . strtotime('2004-10-15') . " AND `time` >= " . strtotime('2004-03-19'));
-$candles = Candle::search("`time` >= " . strtotime("-1 week"));
+$candles = Candle::search("`time` >= " . strtotime("-3 day"));
 //$candles = Candle::search("`time` >= " . strtotime('2017-03-02'));
 
 foreach ($candles as $candle) {
-    //echo date("Ymd", $d->time) . "\n";
+    echo '台指Tick資料：' . date("Ymd-D", $candle->time) . "\n";
     // 有資料就跳過
     if (!empty($candle->frequency)) {
         continue;

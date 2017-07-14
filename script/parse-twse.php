@@ -9,13 +9,13 @@ ini_set('default_socket_timeout', 300); // slow server work run solution
 $url = 'http://www.twse.com.tw/indicesReport/MI_5MINS_HIST?response=csv&date=';
 
 $now = time();
+// 給日期，csv 檔會給當月每天的指數, :NOTE:但若每月最後一天cron 沒跑到，將lose 最後一天資料
 $today = date('Ymd');
-//$last_month_timestamp = strtotime('-1 month');
-//$last_month = date('Ymd', $last_month_timestamp);
+
 $y = date('Y') - 1911;//民國年
 
 $csv_url = $url . $today;
-echo $csv_url . "\n";
+echo '抓指數資訊:' . $csv_url . "\n";
 $csv = file_get_contents($csv_url);
 
 if (!$csv) {

@@ -13,11 +13,11 @@ $msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
 StdLib::log($msg);
 
 
-$candles = Candle::search("`time` >= " . strtotime("-4 week"));
+$candles = Candle::search("`time` >= " . strtotime("-3 day"));
 //$candles = Candle::search("`time` >= " . strtotime("2017/03/28"));
 
 foreach ($candles as $candle) {
-    //echo date("Ymd", $d->time) . "\n";
+    echo '台指成交量：' . date("Ymd-D", $candle->time) . "\n";
     // 有資料就跳過
     if (!empty($candle->volume)) {
         continue;

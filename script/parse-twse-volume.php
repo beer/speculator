@@ -6,6 +6,8 @@
 include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 
+$url = 'http://www.twse.com.tw/exchangeReport/MI_INDEX?response=csv&type=MS&date=';
+
 $now = time();
 $msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
 StdLib::log($msg);
@@ -21,13 +23,8 @@ foreach ($candles as $candle) {
         continue;
     }
     
-    $y = date('Y', $candle->time) - 1911;
-    $m = date('m', $candle->time);
-    $d = date('d', $candle->time);
     $day = date('Ymd', $candle->time);
 
-    //$url = 'http://www.twse.com.tw/ch/trading/exchange/MI_INDEX/MI_INDEX.php';
-    $url = 'http://www.twse.com.tw/exchangeReport/MI_INDEX?response=csv&type=MS&date=';
     $csv_url = $url . $day;
     $csv = file_get_contents($csv_url);
     if (!$csv) {

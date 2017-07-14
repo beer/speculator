@@ -1,5 +1,5 @@
 <?php
-echo date('Y/m/d', 915465600);
+echo date('Y/m/d', 1484236800);
 echo PHP_EOL;
 exit;
 

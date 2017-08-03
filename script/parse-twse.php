@@ -18,11 +18,11 @@ $today = date('Ymd');
 $y = date('Y') - 1911;//民國年
 
 $csv_url = $url . $today;
-echo '抓指數資訊:' . $csv_url . "\n";
+echo '(parse-twse)抓指數資訊:' . $today . "\n";
 $csv = file_get_contents($csv_url);
 
 if (!$csv) {
-    echo "Can't download csv from $csv_url \n";
+    echo "(parse-twse)Can't download csv from $csv_url \n";
 } else {
     file_put_contents('twse_' . $today . '.csv', $csv);
     $handle = fopen('twse_' . $today . '.csv', 'r');

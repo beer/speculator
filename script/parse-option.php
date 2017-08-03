@@ -18,7 +18,7 @@ $last_record_timestamp = mktime(0, 0, 0, $last_record_month, $last_record_day, $
 //echo date('Y/m/d', $last_record_timestamp);
 
 for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
-    echo '選擇權盤後：' . date('Y/m/d (D)', $time) . PHP_EOL;
+    echo '(parse-option)選擇權盤後：' . date('Y/m/d (D)', $time) . PHP_EOL;
     
     // 檢查是否已有資料
     $rows = OptionTrade::search(
@@ -60,9 +60,8 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
     $users = array(1, 2, 3, 1, 2, 3); // 1:'自營商', 2:'投信', 3:'外資'
     $trades = $contracts = array();
     $page_time = strtotime(str_replace('/', '-', $pageHtml->find('#datestart', 0)->value));
-    echo '抓取資料日期：' . $pageHtml->find('#datestart', 0)->value;
+    //echo '抓取資料日期：' . $pageHtml->find('#datestart', 0)->value;
     if (count($table) and $time == $page_time) {
-        echo date('Y/m/d', $time) . 'ok' . PHP_EOL;
         // 3 ~ 9 的 tr 正好是，三大法人
         for ($i = 3; $i < 9; $i++) {
             $user_id = ($i < 6) ? $i - 2 : $i - 5;
@@ -173,7 +172,7 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
                             }
                         }
                     }
-                    echo $value . ', ';
+                    //echo $value . ', ';
                 }
             }/*}}}*/
             echo PHP_EOL;
@@ -190,7 +189,7 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
             }
         }
     } else {
-        echo ' 休盤日或資料日期不正確' . PHP_EOL;
+        echo '(parse-option)休盤日或資料日期不正確' . PHP_EOL;
     }
     /*}}}*/
 }

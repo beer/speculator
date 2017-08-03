@@ -17,7 +17,7 @@ $last_record_day = date('d', $now) - 3;
 $last_record_timestamp = mktime(0, 0, 0, $last_record_month, $last_record_day, $last_record_year);
 
 for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
-    echo '期貨盤後：' . date('Y/m/d (D)', $time) . PHP_EOL;
+    echo '(parse-future)期貨盤後：' . date('Y/m/d (D)', $time) . PHP_EOL;
     
     // 檢查是否已有資料
     $rows = FutureTrade::search(
@@ -59,7 +59,7 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
     $columns = array('buy', 'buy_amount', 'sell', 'sell_amount', 'diff', 'diff_amount', 'buy', 'buy_amount', 'sell', 'sell_amount', 'diff', 'diff_amount',);
     $users = array('', '自營商', '投信', '外資');
     $page_time = strtotime(str_replace('/', '-', $pageHtml->find('#datestart', 0)->value));
-    echo '抓取資料日期：' . $pageHtml->find('#datestart', 0)->value;
+    //echo '抓取資料日期：' . $pageHtml->find('#datestart', 0)->value;
     if (count($table) and $time == $page_time) {
         // 3 ~ 6 的 tr 正好是，三大法人
         for ($i = 3; $i < 6; $i++) {
@@ -100,7 +100,7 @@ for ($time = $last_record_timestamp ; $time < $now ; $time += 86400) {
             echo PHP_EOL;
         }
     } else {
-        echo ' 休盤日或資料日期不正確' . PHP_EOL;
+        echo '(parse-future)休盤日或資料日期不正確' . PHP_EOL;
     }
     /*}}}*/
 }

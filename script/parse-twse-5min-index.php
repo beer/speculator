@@ -10,11 +10,11 @@ Pix_Table::disableLog(Pix_Table::LOG_QUERY);
 $url = 'http://www.twse.com.tw/exchangeReport/MI_5MINS_INDEX?response=csv&date=';
 
 //$candles = Candle::search("`time` < " . strtotime('2004-10-15') . " AND `time` >= " . strtotime('2004-03-19'));
-$candles = Candle::search("`time` >= " . strtotime("-3 day"));
+$candles = Candle::search("`time` >= " . strtotime("-30 day"));
 //$candles = Candle::search("`time` >= " . strtotime('2017-03-02'));
 
 foreach ($candles as $candle) {
-    echo '台指Tick資料：' . date("Ymd-D", $candle->time) . "\n";
+    echo '(parse-twse-5min-index)台指Tick資料：' . date("Ymd-D", $candle->time) . "\n";
     // 有資料就跳過
     if (!empty($candle->frequency)) {
         continue;
@@ -25,7 +25,7 @@ foreach ($candles as $candle) {
     $csv = file_get_contents($csv_url);
 
     if (!$csv) {
-        echo "Can't download csv from $csv_url \n";
+        echo "(parse-twse-5min-index)Can't download csv from $csv_url \n";
     } else {
         file_put_contents('twse_5min_' . $day . '.csv', $csv);
         $handle = fopen('twse_5min_' . $day . '.csv', 'r');

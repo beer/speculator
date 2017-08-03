@@ -16,11 +16,11 @@ $msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
 StdLib::log($msg);
 
 
-$candles = Candle::search("`time` >= " . strtotime("-3 day"));
+$candles = Candle::search("`time` >= " . strtotime("-30 day"));
 //$candles = Candle::search("`time` >= " . strtotime("2017/03/28"));
 
 foreach ($candles as $candle) {
-    echo '台指成交量：' . date("Ymd-D", $candle->time) . "\n";
+    echo '(parse-twse-volume)台指成交量：' . date("Ymd-D", $candle->time) . "\n";
     // 有資料就跳過
     if (!empty($candle->volume)) {
         continue;
@@ -31,7 +31,7 @@ foreach ($candles as $candle) {
     $csv_url = $url . $day;
     $csv = file_get_contents($csv_url);
     if (!$csv) {
-        echo "Can't download csv from $csv_url \n";
+        echo "(parse-twse-volume)Can't download csv from $csv_url \n";
     } else {
         file_put_contents('twse_volume_' . $day . '.csv', $csv);
         $handle = fopen('twse_volume_' . $day . '.csv', 'r');
@@ -55,7 +55,7 @@ foreach ($candles as $candle) {
             }
         }
 
-        echo "{$day} Volume:" . $volume . PHP_EOL;
+        echo "(parse-twse-volume){$day} Volume:" . $volume . PHP_EOL;
         $volume = preg_replace("/([^0-9\\.])/i", "", $volume );
         $candle->volume = $volume;
         $candle->save();

@@ -16,7 +16,7 @@ $msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
 StdLib::log($msg);
 
 
-$candles = Candle::search("`time` >= " . strtotime("-5 day"));
+$candles = Candle::search("`time` >= " . strtotime("-3 day"));
 //$candles = Candle::search("`time` >= " . strtotime("2017/03/28"));
 
 foreach ($candles as $candle) {

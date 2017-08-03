@@ -2,6 +2,10 @@
 <?php
 include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
+
+// hide SQL query
+Pix_Table::disableLog(Pix_Table::LOG_QUERY);
+
 $now = time();
 $today = date('Y-m-d', $now);
 //期交所只提供三年前的資料

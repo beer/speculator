@@ -4,6 +4,9 @@ include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 ini_set('default_socket_timeout', 300); // slow server work run solution
 
+// hide SQL query
+Pix_Table::disableLog(Pix_Table::LOG_QUERY);
+
 $url = 'http://www.twse.com.tw/exchangeReport/MI_5MINS_INDEX?response=csv&date=';
 
 //$candles = Candle::search("`time` < " . strtotime('2004-10-15') . " AND `time` >= " . strtotime('2004-03-19'));
@@ -27,8 +30,6 @@ foreach ($candles as $candle) {
         file_put_contents('twse_5min_' . $day . '.csv', $csv);
         $handle = fopen('twse_5min_' . $day . '.csv', 'r');
         $fp = file('twse_5min_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        $lines = count($fp);
-        echo "{$day}:{$lines}\n";
 
         $i = 0;
         while (($data = fgetcsv($handle)) !== FALSE) {
@@ -50,7 +51,6 @@ foreach ($candles as $candle) {
             $i++;
         }
         // 在candle 加上tick 的頻率
-        echo date('Ymd (D)', $candle->time);
         $candle->frequency = 5;
         $candle->save();
     }

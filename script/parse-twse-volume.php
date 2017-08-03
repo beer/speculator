@@ -6,6 +6,9 @@
 include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 
+// hide SQL query
+Pix_Table::disableLog(Pix_Table::LOG_QUERY);
+
 $url = 'http://www.twse.com.tw/exchangeReport/MI_INDEX?response=csv&type=MS&date=';
 
 $now = time();
@@ -34,7 +37,7 @@ foreach ($candles as $candle) {
         $handle = fopen('twse_volume_' . $day . '.csv', 'r');
         $fp = file('twse_volume_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $lines = count($fp);
-        echo "{$day}:{$lines}\n";
+        //echo "{$day}:{$lines}\n";
         if ($lines > 143) {
             exit;
         }

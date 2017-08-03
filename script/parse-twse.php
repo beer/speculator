@@ -4,6 +4,9 @@ include(__DIR__ . '/../webdata/init.inc.php');
 require_once (LIB_PATH . '/extlibs/simple_html_dom.php');
 ini_set('default_socket_timeout', 300); // slow server work run solution
 
+// hide SQL query
+Pix_Table::disableLog(Pix_Table::LOG_QUERY);
+
 //網頁查尋網址，在20170524 改版AJAX, 所以改用CSV抓資料
 //$url = 'http://www.twse.com.tw/ch/trading/indices/MI_5MINS_HIST/MI_5MINS_HIST.php';
 $url = 'http://www.twse.com.tw/indicesReport/MI_5MINS_HIST?response=csv&date=';

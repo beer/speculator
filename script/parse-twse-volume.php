@@ -16,7 +16,7 @@ $msg = date("Y/m/d H:i:s", $now) . " run parse-twse-volume\n";
 StdLib::log($msg);
 
 
-$candles = Candle::search("`time` >= " . strtotime("-30 day"));
+$candles = Candle::search("`time` >= " . strtotime("-5 day"));
 //$candles = Candle::search("`time` >= " . strtotime("2017/03/28"));
 
 foreach ($candles as $candle) {
@@ -38,7 +38,8 @@ foreach ($candles as $candle) {
         $fp = file('twse_volume_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $lines = count($fp);
         //echo "{$day}:{$lines}\n";
-        if ($lines > 143) {
+        if ($lines > 147) {
+            echo '(parse-twse-volume)'. date("Ymd-D", $candle->time) . '資料格式改變,行數:' . $lines . PHP_EOL;
             exit;
         }
 
@@ -50,6 +51,10 @@ foreach ($candles as $candle) {
                 break;
             }
             if ($lines == 143 && $i == 132) {
+                $volume = $data[1];
+                break;
+            }
+            if ($lines == 147 && $i == 136) {
                 $volume = $data[1];
                 break;
             }

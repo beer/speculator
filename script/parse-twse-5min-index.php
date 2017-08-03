@@ -10,7 +10,7 @@ Pix_Table::disableLog(Pix_Table::LOG_QUERY);
 $url = 'http://www.twse.com.tw/exchangeReport/MI_5MINS_INDEX?response=csv&date=';
 
 //$candles = Candle::search("`time` < " . strtotime('2004-10-15') . " AND `time` >= " . strtotime('2004-03-19'));
-$candles = Candle::search("`time` >= " . strtotime("-30 day"));
+$candles = Candle::search("`time` >= " . strtotime("-3 day"));
 //$candles = Candle::search("`time` >= " . strtotime('2017-03-02'));
 
 foreach ($candles as $candle) {

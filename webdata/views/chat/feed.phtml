@@ -15,17 +15,22 @@
         stroke-width: 1;
     }
 
-    path.ohlc {
+    path.candle {
         stroke: #000000;
+    }
+
+    path.candle.body {
         stroke-width: 1;
     }
 
-    path.ohlc.up {
-        stroke: #00AA00;
+    path.candle.down {
+        fill: #00AA00;
+        stroke: #000000;
     }
 
-    path.ohlc.down {
-        stroke: #FF0000;
+    path.candle.up {
+        fill: #FF0000;
+        stroke: #000000;
     }
 
     .ma-0 path.line {
@@ -63,7 +68,7 @@
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
 
-    var parseDate = d3.timeParse("%d-%b-%y");
+    var parseDate = d3.timeParse("%Y/%m/%d %H:%M:%S");
 
     var x = techan.scale.financetime()
             .range([0, width]);
@@ -74,7 +79,7 @@
     var yVolume = d3.scaleLinear()
             .range([y(0), y(0.2)]);
 
-    var ohlc = techan.plot.ohlc()
+    var candlestick = techan.plot.candlestick()
             .xScale(x)
             .yScale(y);
 
@@ -93,7 +98,7 @@
             .period(20);
 
     var volume = techan.plot.volume()
-            .accessor(ohlc.accessor())   // Set the accessor to a ohlc accessor so we get highlighted bars
+            .accessor(candlestick.accessor())   // Set the accessor to a candlestick accessor so we get highlighted bars
             .xScale(x)
             .yScale(yVolume);
 
@@ -108,11 +113,11 @@
     var timeAnnotation = techan.plot.axisannotation()
             .axis(xAxis)
             .orient('bottom')
-            .format(d3.timeFormat('%Y-%m-%d'))
+            .format(d3.timeFormat('%Y-%m-%d %H:%M'))
             .width(65)
             .translate([0, height]);
 
-    var ohlcAnnotation = techan.plot.axisannotation()
+    var candlestickAnnotation = techan.plot.axisannotation()
             .axis(yAxis)
             .orient('left')
             .format(d3.format(',.2f'));
@@ -126,7 +131,7 @@
             .xScale(x)
             .yScale(y)
             .xAnnotation(timeAnnotation)
-            .yAnnotation([ohlcAnnotation, volumeAnnotation])
+            .yAnnotation([candlestickAnnotation, volumeAnnotation])
             .on("move", move);
 
     var svg = d3.select("body").append("svg")
@@ -136,7 +141,7 @@
     var defs = svg.append("defs");
 
     defs.append("clipPath")
-            .attr("id", "ohlcClip")
+            .attr("id", "candlestickClip")
         .append("rect")
             .attr("x", 0)
             .attr("y", 0)
@@ -146,25 +151,25 @@
     svg = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var ohlcSelection = svg.append("g")
-            .attr("class", "ohlc")
+    var candlestickSelection = svg.append("g")
+            .attr("class", "candlestick")
             .attr("transform", "translate(0,0)");
 
-    ohlcSelection.append("g")
+    candlestickSelection.append("g")
             .attr("class", "volume")
-            .attr("clip-path", "url(#ohlcClip)");
+            .attr("clip-path", "url(#candlestickClip)");
 
-    ohlcSelection.append("g")
+    candlestickSelection.append("g")
             .attr("class", "candlestick")
-            .attr("clip-path", "url(#ohlcClip)");
+            .attr("clip-path", "url(#candlestickClip)");
 
-    ohlcSelection.append("g")
+    candlestickSelection.append("g")
             .attr("class", "indicator sma ma-0")
-            .attr("clip-path", "url(#ohlcClip)");
+            .attr("clip-path", "url(#candlestickClip)");
 
-    ohlcSelection.append("g")
+    candlestickSelection.append("g")
             .attr("class", "indicator sma ma-1")
-            .attr("clip-path", "url(#ohlcClip)");
+            .attr("clip-path", "url(#candlestickClip)");
 
     svg.append("g")
             .attr("class", "x axis")
@@ -172,7 +177,7 @@
 
     svg.append("g")
             .attr("class", "y axis")
-        .append("text")
+            .append("text")
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
             .attr("dy", ".71em")
@@ -183,7 +188,7 @@
             .attr("class", "volume axis");
 
     svg.append('g')
-            .attr("class", "crosshair ohlc");
+            .attr("class", "crosshair candlestick");
 
     var coordsText = svg.append('text')
             .style("text-anchor", "end")
@@ -193,17 +198,18 @@
 
     var feed;
 
-    d3.csv("/webroot/data.csv", function(error, csv) {
-        var accessor = ohlc.accessor();
+    //d3.csv("/webroot/data.csv", function(error, csv) {
+    d3.json("/ajax/feed", function(error, data) {
+        var accessor = candlestick.accessor();
 
-        feed = csv.map(function(d) {
+        feed = data.map(function(d) {
             return {
-                date: parseDate(d.Date),
-                open: +d.Open,
-                high: +d.High,
-                low: +d.Low,
-                close: +d.Close,
-                volume: +d.Volume
+                date: parseDate(d[0]),
+                open: +d[1],
+                high: +d[2],
+                low: +d[3],
+                close: +d[4],
+                volume: +d[5]
             };
         }).sort(function(a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
 
@@ -212,7 +218,7 @@
     });
 
     function redraw(data) {
-        var accessor = ohlc.accessor();
+        var accessor = candlestick.accessor();
 
         x.domain(data.map(accessor.d));
         // Show only 150 points on the plot
@@ -231,12 +237,12 @@
                 selection.select('g.y.axis').call(yAxis);
                 selection.select("g.volume.axis").call(volumeAxis);
 
-                selection.select("g.candlestick").datum(data).call(ohlc);
+                selection.select("g.candlestick").datum(data).call(candlestick);
                 selection.select("g.sma.ma-0").datum(sma0Calculator(data)).call(sma0);
                 selection.select("g.sma.ma-1").datum(sma1Calculator(data)).call(sma1);
                 selection.select("g.volume").datum(data).call(volume);
 
-                svg.select("g.crosshair.ohlc").call(crosshair);
+                svg.select("g.crosshair.candlestick").call(crosshair);
             });
 
         // Set next timer expiry
@@ -262,7 +268,7 @@
 
     function move(coords) {
         coordsText.text(
-                timeAnnotation.format()(coords.x) + ", " + ohlcAnnotation.format()(coords.y)
+                timeAnnotation.format()(coords.x) + ", " + candlestickAnnotation.format()(coords.y)
         );
     }
 

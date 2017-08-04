@@ -1,0 +1,3 @@
+[submodule "webdata/extsrc/techan"]
+	path = webdata/extsrc/techan
+	url = git@github.com:andredumas/techan.js.git

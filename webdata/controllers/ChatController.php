@@ -16,6 +16,11 @@ class ChatController extends Pix_Controller
 
     }
 
+    public function feedAction()
+    {
+
+    }
+
     public function testAction()
     {
 

@@ -157,9 +157,9 @@
 <button class="btn2">布林通道</button>
 <button class="btn3">簡單均線</button>
 <button class="btn4">成 交 量</button>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="/webroot/js/d3/d3.tip.v0.6.3.js"></script>
-<script src="/webroot/js/techan.js"></script>
+<script src="http://d3js.org/d3.v4.min.js"></script>
+<script src="/webroot/js/d3-tip/d3-tip.js"></script>
+<script src="/webroot/js/techan/techan.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <link rel="stylesheet" href="/webroot/css/d3/d3-tip.css">
 <script>
@@ -167,7 +167,7 @@
     var weeks = ['日', '一', '二', '三', '四', '五', '六'];
     var tip = d3.tip().attr('class', 'd3-tip w').html(function(d, i) {
             return timeAnnotation.format()(d.date) + ' (' +
-                   weeks[d3.time.format('%w')(d.date)]+')<br/>' +
+                   weeks[d3.timeFormat('%w')(d.date)]+')<br/>' +
             //return '<b>'+ d.date.toString('yyyy/MM/dd(') + weeks[] +')</b><br/>'
                    '開盤: ' + d.open + '<br/>' +
                    '最高: ' + d.high + '<br/>' +
@@ -189,8 +189,8 @@
         height2 = 500 - margin2.top - margin2.bottom;
 
 
-    var parseDate = d3.time.format("%d-%b-%y").parse,
-        valueFormat = d3.format(',.2fs');
+    var parseDate = d3.timeParse("%d-%b-%y"),
+        valueFormat = d3.format(',.2f');
 
     var x = techan.scale.financetime()
             .range([0, width - 10]);
@@ -198,19 +198,20 @@
     var x2= techan.scale.financetime()
             .range([0, width - 10]);
 
-    var y = d3.scale.linear()
+    var y = d3.scaleLinear()
             .range([height, 0]);
 
-    var y2 = d3.scale.linear()
+    var y2 = d3.scaleLinear()
             .range([height2, 0]);
 
     var percent = y.copy();
 
-    var yVolume = d3.scale.linear()
+    var yVolume = d3.scaleLinear()
             .range([y(0), y(0.2)]);
 
-    var brush = d3.svg.brush()
-            .on("brushend", draw);
+    var brush = d3.brushX()
+            .extent([[0, 0], [width, height2]])
+            .on("end", brushed);
 
     var candlestick = techan.plot.candlestick()
             .xScale(x)
@@ -233,58 +234,48 @@
             .xScale(x2)
             .yScale(y2);
 
-    var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
+    var xAxis = d3.axisBottom(x);
 
-    var xAxis2 = d3.svg.axis()
-            .scale(x2)
-            .orient("bottom");
+    var xAxis2 = d3.axisBottom(x2);
 
-    var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
+    var yAxis = d3.axisLeft(y);
 
-    var yAxis2 = d3.svg.axis()
-            .scale(y2)
-            .ticks(0)
-            .orient("left");
+    var yAxis2 = d3.axisLeft(y2).ticks(0);
 
-    var percentAxis = d3.svg.axis()
-            .scale(percent)
-            .orient("right");
+    var percentAxis = d3.axisRight(percent);
 
-    var yRightAxis = d3.svg.axis()
-            .scale(y)
-            .orient("right");
+    var yRightAxis = d3.axisRight(y);
 
-    var volumeAxis = d3.svg.axis()
-            .scale(yVolume)
-            .orient("right")
+    var volumeAxis = d3.axisRight(yVolume)
             .ticks(3)
-            .tickFormat(d3.format(",.2fs"));
+            .tickFormat(d3.format(",.2f"));
 
     var volumeAnnotation = techan.plot.axisannotation()
             .axis(volumeAxis)
+            .orient('right')
             .width(35);
 
     var ohlcAnnotation = techan.plot.axisannotation()
             .axis(yAxis)
-            .format(d3.format(',.2fs'));
+            .orient('left')
+            .format(d3.format(',.2f'));
 
     var ohlcRightAnnotation = techan.plot.axisannotation()
             .axis(yRightAxis)
+            .orient('right')
             .translate([width, 0])
-            .format(d3.format(',.2fs'));
+            .format(d3.format(',.2f'));
 
     var timeAnnotation = techan.plot.axisannotation()
             .axis(xAxis)
-            .format(d3.time.format('%Y-%m-%d'))
+            .orient('bottom')
+            .format(d3.timeFormat('%Y-%m-%d'))
             .width(65)
             .translate([0, height]);
 
     var percentAnnotation = techan.plot.axisannotation()
             .axis(percentAxis)
+            .orient('right')
             .format(d3.format('+.1%'));
 
     var crosshair = techan.plot.crosshair()
@@ -527,11 +518,12 @@
                 .on('mouseover',tip.show).on('mouseout', tip.hide)
                 .on('mousedown', getDayInfo);
 
+
+
         // Associate the brush with the scale and render the brush only AFTER a domain has been applied
-        zoomable = x.zoomable();
-        zoomable2 = x2.zoomable();
-        brush.x(zoomable2);
         context.select("g.pane").call(brush).selectAll("rect").attr("height", height2);
+
+        x.zoomable().domain(x2.zoomable().domain());
 
         draw();
 
@@ -544,11 +536,21 @@
 
     });
 
+    function brushed() {
+        zoomable = x.zoomable();
+        zoomable2 = x2.zoomable();
+
+        zoomable.domain(zoomable2.domain());
+        if(d3.event.selection !== null) zoomable.domain(d3.event.selection.map(zoomable.invert));
+        draw();
+
+    }
+
     function draw() {
         var candlestickSelection = focus.select("g.candlestick"),
             data = candlestickSelection.datum();
-        zoomable.domain(brush.empty() ? zoomable2.domain() : brush.extent());
-        y.domain(techan.scale.plot.ohlc(data.slice.apply(data, zoomable.domain()), candlestick.accessor()).domain());
+        //zoomable.domain(brush.empty() ? zoomable2.domain() : brush.extent());
+        y.domain(techan.scale.plot.ohlc(data.slice.apply(data, x.zoomable().domain()), candlestick.accessor()).domain());
         candlestickSelection.call(candlestick);
         focus.select("g.volume").call(volume);
         focus.select("g.indicator.sma").call(sma);

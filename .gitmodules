@@ -1,3 +1,6 @@
 [submodule "webdata/extsrc/techan"]
 	path = webdata/extsrc/techan
 	url = git@github.com:andredumas/techan.js.git
+[submodule "webdata/extsrc/d3-tip"]
+	path = webdata/extsrc/d3-tip
+	url = git@github.com:VACLab/d3-tip.git

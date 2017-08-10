@@ -36,9 +36,22 @@ class AjaxController extends Pix_Controller
         $this->json($data);
     }
 
+    public function realtimeAction()
+    {
+        $candles = Candle::search(1)->order('time DESC')->offset(130);
+        $first = $candles->first();
+        $candles = Candle::search('`time` > ' . $first->time)->order('time ASC');
+        $candles = Candle::search('`time` >= ' . strtotime('2017/02/03') . ' AND `time` < ' . strtotime('2017/08/10'))->order('time ASC');
+        $data = array();
+        foreach ($candles as $c) {
+            $data[] = array(date('Y/m/d', $c->time), (float) $c->open, (float) $c->top, (float) $c->low, (float) $c->close, (float) $c->volume / 100000000);
+        }
+        $this->json($data);
+    }
+
     public function feedAction()
     {
-        $periodicity = 30*60; //秒為單位
+        $periodicity = 1*60; //秒為單位
         $start = strtotime('2017-08-03');
         $end = strtotime('2017-08-04 09:35');
 
@@ -48,13 +61,33 @@ class AjaxController extends Pix_Controller
         $ticks = Tick::search("`time` >= {$start} AND `time` <= {$end}")->order('time ASC');
         $length = count($ticks);
 
-        $total_candle = intval($length / ($periodicity / 5));
-
         $data = array();
 
         // 將tick 資料轉為 candle 
         $row = array();
         $pool = array();
+
+        /*
+        // 若是日K, 直接回傳 Candle 資料 
+        //:TODO 若區間是"天", 要直接抓 Candle 的資料
+        if ($periodicity == 86404) {
+            $candle = Candle::search("`date` == " . strtotime('Ymd', $check_date_time));
+
+            if (count($candle)) {
+                $candle = $candle->first();
+            } else { // 預防Cron 抓 Candle 時間的 Delay, 每天3:00pm 才跑
+                $check_date_time = $check_date_time - 86400;
+                $candle = Candle::search("`date` == " . strtotime('Ymd', $check_date_time));
+                $candle = $candle->first();
+            }
+            $data['time'] = date('Y/m/d H:i:s', $tick->time);
+            $data['open'] = $tick->twse;
+            $data['top'] = max($pool);
+            $data['low'] = min($pool);
+            $data['close'] = array_pop($pool);
+            $data['volume'] = rand(10, 1000);
+            $this->json($data);
+        } */
 
         $i = 0;
         foreach ($ticks as $tick) {
@@ -88,7 +121,7 @@ class AjaxController extends Pix_Controller
 
                     // 如果是當日最後一筆資料，需要將資料加到上一個candle
                     if ($tick->time == $current_date_close_time) {
-                        echo $current_date_close_time . PHP_EOL;
+                        //echo $current_date_close_time . PHP_EOL;
                         $last_index = count($data) - 1;
                         $data[$last_index][2] = (float) max($data[$last_index][2], $tick->twse); //top
                         $data[$last_index][3] = (float) min($data[$last_index][3], $tick->twse); //low
@@ -120,34 +153,52 @@ class AjaxController extends Pix_Controller
     public function tickAction()
     {
         $debug = true;
+        $open = '09:00';
+        $close = '13:30';
 
-        // :NOTE: 最後一根，如果是今日最後一根，要加上最後的一個pick
-        //:TODO 若區間是"天", 要直接抓 Candle 的資料
-        $periodicity = 1*60; //秒為單位
+        // :NOTE: 最後一根，如果是今日最後一根，要加上最後的一個tick
+        $periodicity = 24*60*60; //秒為單位
 
-        $current = time();
+        $now = time();
 
         if ($debug) {
             $t = array();
-            $current = time() - 30*60*60;
-            $day_first = strtotime(date('Ymd', $current));
+            $now = $now - 12*60*60;
+        }
+        $open_time = strtotime(date('Ymd', $now) . " {$open}");
+        $close_time = strtotime(date('Ymd', $now) . " {$close}");
+        $week = date('N', $now);
+
+        $last_tick = Tick::search(1)->order('time DESC')->first();
+        //var_dump($last_tick->toArray());
+        //exit;
+        $last_tick_date_time = $last_tick->date;
+
+        // 時間大於最後一筆資料時間，取最後一筆的candle
+        if ($week > 6 or $now > $close_time or $now < $open_time) {
+            $check_date_time = $last_tick_date_time;
+            $tick_start_time = $last_tick->time - $periodicity;
+            if ($periodicity == 86400) {
+                $tick_start_time = strtotime(date('Ymd', $last_tick->time) . " {$open}");
+            }
+        } else { // 當
+            $check_date_time = $now;
+            $period = $now - $open_time;
+            $tick_start_time = $open_time + (intval($period/$periodicity) * $periodicity);
         }
 
-        $period = $current - $day_first;
-        $first_record_time = $day_first + (intval($period/$periodicity) * $periodicity);
+        $t['now'] = date('Y/m/d H:i:s', $now);
+        $t['open_time'] = date('Y/m/d H:i:s', $open_time);
+        $t['close_time'] = date('Y/m/d H:i:s', $close_time);
+        $t['check_date'] = date('Y/m/d H:i:s', $check_date_time);
+        $t['tick_start_time'] = date('Y/m/d H:i:s', $tick_start_time);
 
-        $t['day_first'] = date('Y/m/d H:i:s', $day_first);
-        $t['first_record_time'] = date('Y/m/d H:i:s', $first_record_time);
-        $t['time'] = date('Y/m/d H:i:s', $current);
+        //$this->json($t);
 
-        $ticks = Tick::search("`time` >= {$first_record_time} and `time` <= {$current}")->order('time ASC');
+        $ticks = Tick::search("`time` >= {$tick_start_time} and `time` <= {$now}")->order('time ASC');
+
         $length = count($ticks);
-
-        if ($length == 0) {
-            $first_record_time = $day_first - $periodicity;
-            $ticks = Tick::search("`time` >= {$first_record_time}")->order('time ASC');
-            $length = count($ticks);
-        }
+        //echo $length;
 
         // 將tick 資料轉為 candle 
         $data = array();
@@ -158,22 +209,24 @@ class AjaxController extends Pix_Controller
         foreach ($ticks as $tick) {
             $i++;
 
-            $t[] = array(date('d-M-y H:i:s', $tick->time), (float) $tick->twse, $i);
+            //$t[] = array(date('d-M-y H:i:s', $tick->time), (float) $tick->twse, $i);
 
             if ($i == 1) {
                 $data['time'] = date('Y/m/d H:i:s', $tick->time);
-                $data['open'] = $tick->twse;
+                $data['open'] = (float) $tick->twse;
             }
             $pool[] = $tick->twse;
 
             if ($i == $length) {
-                $data['top'] = max($pool);
-                $data['low'] = min($pool);
-                $data['close'] = array_pop($pool);
-                $data['volume'] = rand(10, 1000);
+                $data['top'] = (float) max($pool);
+                $data['low'] = (float) min($pool);
+                $data['close'] = (float) array_pop($pool);
+                $data['volume'] = (float) rand(10, 1000);
             }
         }
-        $data['t'] = $t;
+        
+        //array_unshift($data, $t);
+
         $this->json($data);
     }
 }

@@ -31,7 +31,7 @@ class Candle extends SpeculatorTable
         $this->_columns['top'] = array('type' => 'float', 'size' => 10);
         $this->_columns['low'] = array('type' => 'float', 'size' => 10);
         $this->_columns['close'] = array('type' => 'float', 'size' => 10);
-        $this->_columns['volume'] = array('type' => 'bigint', 'size' => 10);
+        $this->_columns['volume'] = array('type' => 'bigint', 'size' => 15);
         $this->_columns['frequency'] = array('type' => 'int', 'size' => 10);
         $this->_columns['created_at'] = array('type' => 'int', 'size' => 10);
         $this->_columns['updated_at'] = array('type' => 'int', 'size' => 10);

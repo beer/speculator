@@ -25,6 +25,7 @@ class Tick extends SpeculatorTable
         $this->_columns['date'] = array('type' => 'int', 'size' => 10);
         $this->_columns['time'] = array('type' => 'int', 'size' => 10);
         $this->_columns['twse'] = array('type' => 'float', 'size' => 10);
+        $this->_columns['volume'] = array('type' => 'bigint', 'size' => 15);
         $this->_columns['created_at'] = array('type' => 'int', 'size' => 10);
         $this->_columns['updated_at'] = array('type' => 'int', 'size' => 10);
     }

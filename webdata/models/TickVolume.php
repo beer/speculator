@@ -16,8 +16,8 @@ class TickVolume extends SpeculatorTable
 {
     public function init()
     {
-        $this->_name = 'ticks';
-        $this->_rowClass = 'TickRow';
+        $this->_name = 'ticks_volumes';
+        $this->_rowClass = 'TickVolumeRow';
 
         $this->_primary = 'id';
 

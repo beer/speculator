@@ -12,14 +12,14 @@ $future_url = 'http://mis.twse.com.tw/stock/data/futures_side.txt?_=';
 $twse_1min_url = 'http://mis.twse.com.tw/stock/api/getChartOhlcStatis.jsp?ex=tse&ch=t00.tw&fqy=1&_=';
 
 $now = time();
-$now = time() - 13*60*60;
+//$now = time() - 13*60*60;
 $open = strtotime(date('Ymd', $now) .'09:00');
 $close = strtotime(date('Ymd', $now) .'13:33'); // 最後一筆資料是 13:33 出來
 $start = strtotime(date('Ymd', $now) .' 08:50');
 $stop = strtotime(date('Ymd', $now) .' 13:40');
 while(1) {
     $now = time();
-    $now = time() - 13*60*60;
+    //$now = time() - 13*60*60;
     echo '(parse-twse-realtime)抓指數資訊:' . date('Y/m/d H:i:s', $now) . PHP_EOL;
     if ($now < $start) {
         echo "sleep ". ($start - $now) . ' s'. PHP_EOL;
@@ -67,6 +67,18 @@ while(1) {
                 $tick->twse = $twse->z;
                 $tick->volume = $twse->v;
                 $tick->save();
+
+                $volume = TickVolume::createRow();
+                $volume->date = strtotime($twse->d);
+                $volume->time = $tick_time;
+                $volume->buy_count = $trade->t2;
+                $volume->buy_volume = $trade->t4;
+                $volume->sell_count = $trade->t1;
+                $volume->sell_volume = $trade->t3;
+                $volume->deal_count = $trade->tr;
+                $volume->deal_volume = $trade->tv;
+                $volume->volume = $trade->tz;
+                $volume->save();
             }
         }
         sleep(5);

@@ -1,5 +1,5 @@
 <?php
-class ChatController extends Pix_Controller
+class ChartController extends Pix_Controller
 {
     public function indexAction()
     {

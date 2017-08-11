@@ -10,7 +10,7 @@ set('repository', 'git@github.com:beer/speculator.git');
 set('shared_files', ['config/database.json']);
 set('shared_dirs', []);
 set('writable_dirs', []);
-set('default_stage', 'beta');
+set('default_stage', 'prod');
 
 
 // Hosts

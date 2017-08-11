@@ -48,6 +48,7 @@ foreach ($candles as $candle) {
                 // 來源資料格式有問題，時間為="09:00:00", 需拿掉 = & "
                 $time = preg_replace('/=|\"/', "", $time);
                 $day_time = strtotime("$day {$time}");
+                $buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
                 $volume = preg_replace("/([^0-9\\.])/i", "", $data[7]);
 
 
@@ -69,7 +70,7 @@ foreach ($candles as $candle) {
                 } else {
                     $check = $check->first();
                     $volume = preg_replace("/([^0-9\\.])/i", "", $data[7]);
-                    if ($volume != $check->volume) {
+                    if ($buy_count != $check->buy_count) { // 要用buy_count 判斷，因為開盤第一筆資料 volume 為 0
                         $check->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
                         $check->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
                         $check->sell_count = preg_replace("/([^0-9\\.])/i", "", $data[3]);

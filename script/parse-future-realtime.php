@@ -16,6 +16,7 @@ $open = strtotime(date('Ymd', $now) .'08:45');
 $close = strtotime(date('Ymd', $now) .'13:45'); // 最後一筆資料是 13:33 出來
 $start = strtotime(date('Ymd', $now) .' 08:35');
 $stop = strtotime(date('Ymd', $now) .' 13:55');
+$day = strtotime(date('Ymd', $now));
 
 $curl = init_curl($taifex_url);
 
@@ -31,16 +32,63 @@ while(1) {
     }
     if ($now >= $start and $now <= $stop) {
 
+        // 來源1: http://mis.twse.com.tw/stock/index.jsp
         $key = intval(microtime(true)*1000);
         $json_url = $future_url . $key;
         $json = file_get_contents($json_url);
         $obj = json_decode($json);
-        echo "期貨({$obj->msgArray[0]->t}) high:{$obj->msgArray[0]->h}, low:{$obj->msgArray[0]->l}, close:{$obj->msgArray[0]->z}" . PHP_EOL;
+        echo "{$obj->msgArray[0]->c}({$obj->msgArray[0]->t}) high:{$obj->msgArray[0]->h}, low:{$obj->msgArray[0]->l}, close:{$obj->msgArray[0]->z}" . PHP_EOL;
 
-        $row = parser($curl);
-        echo "期指({$row['time']}) high:{$row['top']}, low:{$row['low']}, close:{$row['close']}" . PHP_EOL;
-       // echo "{$row['label']}({$row['time']}) high:{$row['top']}, low:{$row['low']}, close:{$row['close']}, open:{$row['open']}, volume:{$row['volume']}" . PHP_EOL;
+        $day_time = strtotime($obj->msgArray[0]->d . ' ' . $obj->msgArray[0]->t);
+        $check = FutureTick::search("`time` = {$day_time} AND `label` = '{$obj->msgArray[0]->c}'");
+        if (count($check) < 1) {
+            $tick = FutureTick::createRow();
+            $tick->date = strtotime($obj->msgArray[0]->d);
+            $tick->time = $day_time;
+            $tick->label = $obj->msgArray[0]->c;
+            $tick->top = $obj->msgArray[0]->h;
+            $tick->low = $obj->msgArray[0]->l;
+            $tick->close = $obj->msgArray[0]->z;
+            $tick->change = $obj->msgArray[0]->z - $obj->msgArray[0]->y;
+            $tick->ex_close = $obj->msgArray[0]->y;
+            $tick->save();
+        }
+        
+        // 來源2: 抓期交所 5sec 資料 http://www.taifex.com.tw/chinese/3/dl_3_1_2.asp
+        $futures = parser($curl);
+        
+        foreach ($futures as $f) {
+            echo "{$f['label']}({$f['time']}) high:{$f['top']}, low:{$f['low']}, close:{$f['close']}" . PHP_EOL;
 
+            $day_time = strtotime(date('Ymd', $now) . ' ' . $f['time']);
+            $check = FutureTick::search("`time` = {$day_time} AND `label` = '{$f['label']}'");
+
+            if (count($check) < 1) {
+                $tick = FutureTick::createRow();
+            } else {
+                $tick = $check->first();
+                if ($tick->volume == $f['volume']) {
+                    continue;
+                }
+            }
+            $tick->date = $day;
+            $tick->time = $day_time;
+            $tick->label = $f['label'];
+            $tick->open = $f['open'];
+            $tick->top = $f['top'];
+            $tick->low = $f['low'];
+            $tick->close = $f['close'];
+            $tick->bid = $f['bid'];
+            $tick->bid_count = $f['bid_count'];
+            $tick->ask = $f['ask'];
+            $tick->ask_count = $f['ask_count'];
+            $tick->change = $f['change'];
+            $tick->amplitude = $f['amplitude'];
+            $tick->volume = $f['volume'];
+            $tick->ex_close = $f['ex_close'];
+            $tick->save();
+
+        }
         sleep(5);
     }
     if ($now > $stop) {
@@ -60,24 +108,31 @@ function init_curl($url){
 function parser($curl) {
     $response = curl_exec($curl);
     $pageHtml = str_get_html($response);
+    $result = array();
 
-    $row = $pageHtml->find('.custDataGridRow', 2);
-
-    $result = array(
-        'label' => trim($row->children(0)->plaintext),
-        'status' => trim($row->children(1)->plaintext),
-        'buy_price' => $row->children(2)->plaintext,
-        'buy_count' => $row->children(3)->plaintext,
-        'sell_price' => $row->children(4)->plaintext,
-        'sell_count' => $row->children(5)->plaintext,
-        'close' => $row->children(6)->plaintext,
-        'change' => $row->children(7)->plaintext,
-        'percentage' => $row->children(8)->plaintext,
-        'volume' => $row->children(9)->plaintext,
-        'open' => $row->children(10)->plaintext,
-        'top' => $row->children(11)->plaintext,
-        'low' => $row->children(12)->plaintext,
-        'time' => $row->children(14)->plaintext
-    );
+    // 第2筆資料是大台近，第25筆是小台近
+    foreach (array(2, 25) as $k => $v) {
+        $row = $pageHtml->find('.custDataGridRow', $v);
+        $label = ($v == 2 ? 'TX' : 'MTX') . substr(trim($row->children(0)->plaintext), -3);
+        // 移掉 ,
+        $regex = "/([^0-9\\.])/i";
+        $result[] = array(
+            'label' => $label,
+            'status' => trim($row->children(1)->plaintext),
+            'bid' => preg_replace($regex, '', $row->children(2)->plaintext),
+            'bid_count' => preg_replace($regex, '',$row->children(3)->plaintext),
+            'ask' => preg_replace($regex, '',$row->children(4)->plaintext),
+            'ask_count' => preg_replace($regex, '',$row->children(5)->plaintext),
+            'close' => preg_replace($regex, '',$row->children(6)->plaintext),
+            'change' => $row->children(7)->plaintext,
+            'amplitude' => $row->children(8)->plaintext,
+            'volume' => preg_replace($regex, '',$row->children(9)->plaintext),
+            'open' => preg_replace($regex, '',$row->children(10)->plaintext),
+            'top' => preg_replace($regex, '',$row->children(11)->plaintext),
+            'low' => preg_replace($regex, '',$row->children(12)->plaintext),
+            'ex_close' => preg_replace($regex, '',$row->children(13)->plaintext),
+            'time' => preg_replace($regex, '',$row->children(14)->plaintext)
+        );
+    }
     return $result;
 }

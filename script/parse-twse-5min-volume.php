@@ -24,7 +24,7 @@ foreach ($candles as $candle) {
 
     // 已有資料就跳過
     $check = TickVolume::search('`date` = ' . $candle->time);
-    if (count($check)) {
+    if (count($check) == 3241) { // 5 sec tick 1天要有 3241 資料
         continue;
     }
     
@@ -39,6 +39,7 @@ foreach ($candles as $candle) {
         $handle = fopen('twse_5min_volume_' . $day . '.csv', 'r');
         $fp = file('twse_5min_volume_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $i = 0;
+        $create_ticks = $update_ticks = 0;
         while (($data = fgetcsv($handle)) !== FALSE) {
             $i++;
             if ($i > 2 and $i < 3244) { // 前兩行是日期&欄位，直接跳過, 後面文字說明也跳過
@@ -46,21 +47,45 @@ foreach ($candles as $candle) {
                 // 移掉, 
                 // 來源資料格式有問題，時間為="09:00:00", 需拿掉 = & "
                 $time = preg_replace('/=|\"/', "", $time);
+                $day_time = strtotime("$day {$time}");
+                $volume = preg_replace("/([^0-9\\.])/i", "", $data[7]);
 
-                $tick = TickVolume::createRow();
-                $tick->date = $candle->time;
-                $day_time = "$day {$time}";
-                $tick->time = strtotime($day_time);
-                $tick->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
-                $tick->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
-                $tick->sell_count = preg_replace("/([^0-9\\.])/i", "", $data[3]);
-                $tick->sell_volume = preg_replace("/([^0-9\\.])/i", "", $data[4]);
-                $tick->deal_count = preg_replace("/([^0-9\\.])/i", "", $data[5]);
-                $tick->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
-                $tick->volume = preg_replace("/([^0-9\\.])/i", "", $data[7]);
 
-                $tick->save();
+                $check = TickVolume::search("`time` = {$day_time}");
+                if (count($check) < 1) {
+                    $tick = TickVolume::createRow();
+                    $tick->date = $candle->time;
+                    $tick->time = $day_time;
+                    $tick->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
+                    $tick->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
+                    $tick->sell_count = preg_replace("/([^0-9\\.])/i", "", $data[3]);
+                    $tick->sell_volume = preg_replace("/([^0-9\\.])/i", "", $data[4]);
+                    $tick->deal_count = preg_replace("/([^0-9\\.])/i", "", $data[5]);
+                    $tick->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
+                    $tick->volume = $volume;
+                    $tick->save();
+                    echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s') . "({$day_time}) created" . PHP_EOL;
+                    $create_ticks++;
+                } else {
+                    $check = $check->first();
+                    $volume = preg_replace("/([^0-9\\.])/i", "", $data[7]);
+                    if ($volume != $check->volume) {
+                        $check->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
+                        $check->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
+                        $check->sell_count = preg_replace("/([^0-9\\.])/i", "", $data[3]);
+                        $check->sell_volume = preg_replace("/([^0-9\\.])/i", "", $data[4]);
+                        $check->deal_count = preg_replace("/([^0-9\\.])/i", "", $data[5]);
+                        $check->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
+                        $check->volume = $volume;
+                        $check->save();
+                        echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s') . "({$day_time}) {$check->volume} -> {$volume}" . PHP_EOL;
+                        $update_ticks++;
+                    }
+
+                }
+
             }
         }
+        echo "(parse-twse-5min-volume) created {$create_ticks} ticks, updated {$update_ticks} ticks" . PHP_EOL;
     }
 }

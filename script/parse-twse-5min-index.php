@@ -49,14 +49,14 @@ foreach ($candles as $candle) {
                     $tick->time = $day_time;
                     $tick->twse = $twse;
                     $tick->save();
-                    echo "(parse-twse-5min-index)" . date('Y/m/d H:i:s') . "({$day_time}) twse -> {$twse}" . PHP_EOL;
+                    echo "(parse-twse-5min-index)" . date('Y/m/d H:i:s', $day_time) . "({$day_time}) twse -> {$twse}" . PHP_EOL;
                     $create_ticks++;
                 } else {
                     $check = $check->first();
                     if ($twse != $check->twse) {
                         $check->twse = $twse;
                         $check->save();
-                        echo "(parse-twse-5min-index)" . date('Y/m/d H:i:s') . "({$day_time}) {$check->twse} -> {$twse}" . PHP_EOL;
+                        echo "(parse-twse-5min-index)" . date('Y/m/d H:i:s', $day_time) . "({$day_time}) {$check->twse} -> {$twse}" . PHP_EOL;
                         $update_ticks++;
                     }
                 }

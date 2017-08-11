@@ -65,7 +65,7 @@ foreach ($candles as $candle) {
                     $tick->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
                     $tick->volume = $volume;
                     $tick->save();
-                    echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s') . "({$day_time}) created" . PHP_EOL;
+                    echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s', $day_time) . "({$day_time}) created" . PHP_EOL;
                     $create_ticks++;
                 } else {
                     $check = $check->first();
@@ -79,7 +79,7 @@ foreach ($candles as $candle) {
                         $check->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
                         $check->volume = $volume;
                         $check->save();
-                        echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s') . "({$day_time}) {$check->volume} -> {$volume}" . PHP_EOL;
+                        echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s', $day_time) . "({$day_time}) {$check->buy_count} -> {$buy_count}" . PHP_EOL;
                         $update_ticks++;
                     }
 

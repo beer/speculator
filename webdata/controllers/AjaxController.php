@@ -163,7 +163,7 @@ class AjaxController extends Pix_Controller
 
         if ($debug) {
             $t = array();
-            $now = $now - 7*60*60;
+            //$now = $now - 7*60*60;
         }
         $open_time = strtotime(date('Ymd', $now) . " {$open}");
         $close_time = strtotime(date('Ymd', $now) . " {$close}");
@@ -217,13 +217,20 @@ class AjaxController extends Pix_Controller
                 $data['open'] = (float) $tick->twse;
                 $volume = $tick->volume;
             }
+
+            // 第一筆tick 其實是 09:00:05 的特殊處理
+            if ($i == 2 and $tick->time == strtotime(date('Y/m/d', $tick->date) . '09:00:05')) {
+                $data['open'] = (float) $tick->twse;
+                $pool = array();
+            }
+
             $pool[] = $tick->twse;
 
             if ($i == $length) {
                 $data['top'] = (float) max($pool);
                 $data['low'] = (float) min($pool);
                 $data['close'] = (float) array_pop($pool);
-                $data['volume'] = ($tick->volume - $volume) / 100;
+                $data['volume'] = ($tick->volume - $volume) / 100; // 以億元為單位，原始單位為百萬
             }
         }
         

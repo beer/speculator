@@ -54,22 +54,21 @@ foreach ($candles as $candle) {
 
                 $check = TickVolume::search("`time` = {$day_time}");
                 if (count($check) < 1) {
-                    $tick = TickVolume::createRow();
-                    $tick->date = $candle->time;
-                    $tick->time = $day_time;
-                    $tick->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
-                    $tick->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
-                    $tick->sell_count = preg_replace("/([^0-9\\.])/i", "", $data[3]);
-                    $tick->sell_volume = preg_replace("/([^0-9\\.])/i", "", $data[4]);
-                    $tick->deal_count = preg_replace("/([^0-9\\.])/i", "", $data[5]);
-                    $tick->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
-                    $tick->volume = $volume;
-                    $tick->save();
+                    $row = TickVolume::createRow();
+                    $row->date = $candle->time;
+                    $row->time = $day_time;
+                    $row->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
+                    $row->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
+                    $row->sell_count = preg_replace("/([^0-9\\.])/i", "", $data[3]);
+                    $row->sell_volume = preg_replace("/([^0-9\\.])/i", "", $data[4]);
+                    $row->deal_count = preg_replace("/([^0-9\\.])/i", "", $data[5]);
+                    $row->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
+                    $row->volume = $volume * 1000000;
+                    $row->save();
                     echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s', $day_time) . "({$day_time}) created" . PHP_EOL;
                     $create_ticks++;
                 } else {
                     $check = $check->first();
-                    $volume = preg_replace("/([^0-9\\.])/i", "", $data[7]);
                     if ($buy_count != $check->buy_count) { // 要用buy_count 判斷，因為開盤第一筆資料 volume 為 0
                         $check->buy_count = preg_replace("/([^0-9\\.])/i", "", $data[1]);
                         $check->buy_volume = preg_replace("/([^0-9\\.])/i", "", $data[2]);
@@ -77,7 +76,7 @@ foreach ($candles as $candle) {
                         $check->sell_volume = preg_replace("/([^0-9\\.])/i", "", $data[4]);
                         $check->deal_count = preg_replace("/([^0-9\\.])/i", "", $data[5]);
                         $check->deal_volume = preg_replace("/([^0-9\\.])/i", "", $data[6]);
-                        $check->volume = $volume;
+                        $check->volume = $volume * 1000000;
                         $check->save();
                         echo "(parse-twse-5min-volume)" . date('Y/m/d H:i:s', $day_time) . "({$day_time}) {$check->buy_count} -> {$buy_count}" . PHP_EOL;
                         $update_ticks++;
@@ -85,6 +84,15 @@ foreach ($candles as $candle) {
 
                 }
 
+                // 更新 tick 的 volume column
+                $tick = Tick::search("`time` = {$day_time}");
+                if (count($tick)) {
+                    $tick = $tick->first();
+                    if ($tick->volume != $volume) {
+                        $tick->volume = $volume;
+                        $tick->save();
+                    }
+                }
             }
         }
         echo "(parse-twse-5min-volume) created {$create_ticks} ticks, updated {$update_ticks} ticks" . PHP_EOL;

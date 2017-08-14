@@ -163,7 +163,7 @@ class AjaxController extends Pix_Controller
 
         if ($debug) {
             $t = array();
-            //$now = $now - 12*60*60;
+            $now = $now - 7*60*60;
         }
         $open_time = strtotime(date('Ymd', $now) . " {$open}");
         $close_time = strtotime(date('Ymd', $now) . " {$close}");
@@ -206,6 +206,7 @@ class AjaxController extends Pix_Controller
 
 
         $i = 0;
+        $volume = 0;
         foreach ($ticks as $tick) {
             $i++;
 
@@ -214,6 +215,7 @@ class AjaxController extends Pix_Controller
             if ($i == 1) {
                 $data['time'] = date('Y/m/d H:i:s', $tick->time);
                 $data['open'] = (float) $tick->twse;
+                $volume = $tick->volume;
             }
             $pool[] = $tick->twse;
 
@@ -221,7 +223,7 @@ class AjaxController extends Pix_Controller
                 $data['top'] = (float) max($pool);
                 $data['low'] = (float) min($pool);
                 $data['close'] = (float) array_pop($pool);
-                $data['volume'] = (float) rand(10, 1000);
+                $data['volume'] = ($tick->volume - $volume) / 100;
             }
         }
         

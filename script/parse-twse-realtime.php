@@ -17,7 +17,7 @@ $open = strtotime(date('Ymd', $now) .' 09:00');
 $close = strtotime(date('Ymd', $now) .' 13:33'); // 最後一筆資料是 13:33 出來
 $start = strtotime(date('Ymd', $now) .' 08:50');
 $stop = strtotime(date('Ymd', $now) .' 13:40');
-$first_tick_time = strtotime(date('Ymd', $now) .' 09:05');
+$first_tick_time = strtotime(date('Ymd', $now) .' 09:00:05');
 while(1) {
     $now = time();
     //$now = time() - 13*60*60;
@@ -115,7 +115,7 @@ while(1) {
                }
             }
         }
-        sleep(5);
+        sleep(3);
     }
     if ($now > $stop) {
         echo "已超過今日開盤時間 ". PHP_EOL;

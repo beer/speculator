@@ -14,7 +14,7 @@ $now = time();
 //$now = time() - 13*60*60;
 $open = strtotime(date('Ymd', $now) .'08:45');
 $close = strtotime(date('Ymd', $now) .'13:45'); // 最後一筆資料是 13:33 出來
-$start = strtotime(date('Ymd', $now) .' 08:35');
+$start = strtotime(date('Ymd', $now) .' 08:25');
 $stop = strtotime(date('Ymd', $now) .' 13:55');
 $day = strtotime(date('Ymd', $now));
 
@@ -41,7 +41,7 @@ while(1) {
 
         $day_time = strtotime($obj->msgArray[0]->d . ' ' . $obj->msgArray[0]->t);
         $check = FutureTick::search("`time` = {$day_time} AND `label` = '{$obj->msgArray[0]->c}'");
-        if (count($check) < 1) {
+        if (count($check) < 1 and $obj->msgArray[0]->z) {
             $tick = FutureTick::createRow();
             $tick->date = strtotime($obj->msgArray[0]->d);
             $tick->time = $day_time;

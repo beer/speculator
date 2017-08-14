@@ -41,7 +41,7 @@ class AjaxController extends Pix_Controller
         $candles = Candle::search(1)->order('time DESC')->offset(130);
         $first = $candles->first();
         $candles = Candle::search('`time` > ' . $first->time)->order('time ASC');
-        $candles = Candle::search('`time` >= ' . strtotime('2017/02/06') . ' AND `time` < ' . strtotime('2017/08/11'))->order('time ASC');
+        //$candles = Candle::search('`time` >= ' . strtotime('2017/02/06') . ' AND `time` < ' . strtotime('2017/08/11'))->order('time ASC');
         $data = array();
         foreach ($candles as $c) {
             $data[] = array(date('Y/m/d', $c->time), (float) $c->open, (float) $c->top, (float) $c->low, (float) $c->close, (float) $c->volume / 100000000);

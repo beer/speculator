@@ -1,12 +1,12 @@
 <?php
 include(__DIR__ . '/../webdata/init.inc.php');
-$day = strtotime('2017-08-11');
+$day = strtotime('2017-08-14');
 $lost_tick = $lost_volume = 0;
 $lost_ticks = $lost_volumes = array();
 
 $ticks = Tick::search(array('date' => $day))->order('`time` ASC');
 echo 'Ticks:' . count($ticks) . PHP_EOL;
-$ex_time = strtotime('2017-08-11 09:00:00');
+$ex_time = strtotime('2017-08-14 09:00:00');
 foreach ($ticks as $t) {
     if (($t->time - $ex_time) != 5 and ($t->time - $ex_time) != 0) {
         //echo date('Y/m/d H:i:s', $ex_time) . ' ~ ' . date('Y/m/d H:i:s', $t->time) . ' 間: ' . (($t->time - $ex_time) / 5 - 1) . ' 筆資料' . PHP_EOL;
@@ -19,7 +19,7 @@ echo '共 ' . $lost_ticks . '筆資料' . PHP_EOL;
 
 $volumes = TickVolume::search(array('date' => $day))->order('`time` ASC');
 echo 'Volumes:' . count($volumes) . PHP_EOL;
-$ex_time = strtotime('2017-08-11 09:00:00');
+$ex_time = strtotime('2017-08-14 09:00:00');
 foreach ($volumes as $t) {
     if (($t->time - $ex_time) != 5 and ($t->time - $ex_time) != 0) {
         //echo date('Y/m/d H:i:s', $ex_time) . ' ~ ' . date('Y/m/d H:i:s', $t->time) . ' 間: ' . (($t->time - $ex_time) / 5 - 1) . ' 筆資料' . PHP_EOL;

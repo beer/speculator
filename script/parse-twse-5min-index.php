@@ -27,13 +27,13 @@ foreach ($candles as $candle) {
     if (!$csv) {
         echo "(parse-twse-5min-index)Can't download csv from $csv_url \n";
     } else {
-        file_put_contents('twse_5min_' . $day . '.csv', $csv);
-        $handle = fopen('twse_5min_' . $day . '.csv', 'r');
-        $fp = file('twse_5min_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $temp = tmpfile();
+        fwrite($temp, $csv);
+        fseek($temp, 0); // 把 index 設定到第一行
 
         $i = 0;
         $create_ticks = $update_ticks = 0;
-        while (($data = fgetcsv($handle)) !== FALSE) {
+        while (($data = fgetcsv($temp)) !== FALSE) {
             if ($i > 1 and $i < 3243) { // 前兩行是日期&欄位，直接跳過, 後面文字說明也跳過
                 $time = $data[0];
                 // 移掉, 

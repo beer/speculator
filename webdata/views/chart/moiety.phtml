@@ -150,7 +150,7 @@
         top: 110px;
     }
 
-</style>/*}}}*/
+</style><!--/*}}}*/-->
 <body>
 <div id="info"></div>
 <button class="btn1">二分一線</button>
@@ -324,29 +324,6 @@
             .attr("width", width + margin.left + margin.right)
             .attr("height", height);
 
-    /*
-    var defs = svg.append("defs");
-
-    defs.append("clipPath")
-            .attr("id", "ohlcClip")
-        .append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", width)
-            .attr("height", height);
-
-    defs.append("clipPath")
-            .attr("id", "supstanceClip")
-        .append("rect")
-            .attr("x", -margin.left)
-            .attr("y", 0)
-            .attr("width", width+margin.left)
-            .attr("height", height);
-
-    svg = svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    */
-
     var valueText = focus.append('text')
             .style("text-anchor", "end")
             .attr("class", "coords")
@@ -517,8 +494,6 @@
                 .attr("opacity", '0.12')
                 .on('mouseover',tip.show).on('mouseout', tip.hide)
                 .on('mousedown', getDayInfo);
-
-
 
         // Associate the brush with the scale and render the brush only AFTER a domain has been applied
         context.select("g.pane").call(brush).selectAll("rect").attr("height", height2);

@@ -33,10 +33,13 @@ foreach ($candles as $candle) {
     if (!$csv) {
         echo "(parse-twse-volume)Can't download csv from $csv_url \n";
     } else {
-        file_put_contents('twse_volume_' . $day . '.csv', $csv);
-        $handle = fopen('twse_volume_' . $day . '.csv', 'r');
-        $fp = file('twse_volume_' . $day . '.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $temp = tmpfile();
+        fwrite($temp, $csv);
+        fseek($temp, 0); // 把 index 設定到第一行
+        $temp_meta = stream_get_meta_data($temp);
+        $fp = file($temp_meta['uri'], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $lines = count($fp);
+
         //echo "{$day}:{$lines}\n";
         if ($lines > 147) {
             echo '(parse-twse-volume)'. date("Ymd-D", $candle->time) . '資料格式改變,行數:' . $lines . PHP_EOL;
@@ -44,7 +47,7 @@ foreach ($candles as $candle) {
         }
 
         $i = 0;
-        while (($data = fgetcsv($handle)) !== FALSE) {
+        while (($data = fgetcsv($temp)) !== FALSE) {
             $i++;
             if ($lines == 139 && $i == 128) {
                 $volume = $data[1];

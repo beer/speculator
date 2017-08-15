@@ -24,10 +24,12 @@ $csv = file_get_contents($csv_url);
 if (!$csv) {
     echo "(parse-twse)Can't download csv from $csv_url \n";
 } else {
-    file_put_contents('twse_' . $today . '.csv', $csv);
-    $handle = fopen('twse_' . $today . '.csv', 'r');
+    $temp = tmpfile();
+    fwrite($temp, $csv);
+    fseek($temp, 0); // 把 index 設定到第一行
+
     $i = 0;
-    while (($data = fgetcsv($handle)) !== FALSE) {
+    while (($data = fgetcsv($temp)) !== FALSE) {
         if ($i > 1) { // 前兩行是日期&欄位，直接跳過
             // time, EX: 103/01/05
             $time = $data[0];

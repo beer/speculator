@@ -36,5 +36,7 @@ call_user_func(function() {
     ));
 });
 
+Pix_Table::addStaticResultSetHelper('Pix_Array_Volume');
+
 // show SQL query
 Pix_Table::enableLog(Pix_Table::LOG_QUERY);

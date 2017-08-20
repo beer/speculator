@@ -67,7 +67,15 @@ $next_clearance = StdLib::getClearance(1, $this->day);
     </tr>
     <?php
     $bgColor = true;
-    for ($t = $previous_clearance; $t < $clearance; $t += 86400) {
+    if ($this->day > $clearance) {
+        $start = $clearance;
+        $end = $next_clearance;
+    } else {
+        $start = $previous_clearance;
+        $end = $clearance;
+    }
+
+    for ($t = $start; $t <= $end; $t += 86400) {
         $bgColor = !$bgColor;
         echo $this->partial('/ajax/dayinfo_row.phtml', array('today' => $t, 'bgColor' => $bgColor));
     }

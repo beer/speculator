@@ -45,6 +45,6 @@ class ChartController extends Pix_Controller
     public function infoAction()
     {
         $v = $this->view;
-        $v->day = strtotime($_GET['day']);
+        $v->day = $_GET['day'] ? strtotime($_GET['day']) : time();
     }
 }

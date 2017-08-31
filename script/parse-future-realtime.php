@@ -37,6 +37,12 @@ while(1) {
         $json_url = $future_url . $key;
         $json = file_get_contents($json_url);
         $obj = json_decode($json);
+
+        if (empty($obj)) {
+            echo '抓資料失敗........' . PHP_EOL;
+            continue;
+        }
+
         echo "{$obj->msgArray[0]->c}({$obj->msgArray[0]->t}) high:{$obj->msgArray[0]->h}, low:{$obj->msgArray[0]->l}, close:{$obj->msgArray[0]->z}" . PHP_EOL;
 
         $day_time = strtotime($obj->msgArray[0]->d . ' ' . $obj->msgArray[0]->t);

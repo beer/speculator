@@ -45,6 +45,13 @@ while(1) {
         $json_url = $twse_1min_url . $key;
         $json = file_get_contents($json_url);
         $obj = json_decode($json);
+ 
+        // 資料抓失敗就跳過
+        if (empty($obj)) {
+            echo '抓資料之敗........' . PHP_EOL;
+            continue;
+        }
+
         $twse = $obj->infoArray[0];
         $trade = $obj->staticObj;
         echo "台指({$twse->t}) open:{$twse->o}, high:{$twse->h}, low:{$twse->l}, close:{$twse->z}, volume:{$twse->v}" . PHP_EOL;

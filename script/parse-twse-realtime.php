@@ -60,7 +60,7 @@ while(1) {
             $tick_time = strtotime("{$twse->d} 13:30:00");
         }
         if ($tick_time >= $open and $tick_time <= $close) {
-            if ($tick_time == $first_tick_time) { // 補上 9:00 第一筆資料
+            if ($tick_time == $first_tick_time or $tick_time == $open) { // 補上 9:00 第一筆資料
                 $last_tick = Tick::search(1)->order('`time` DESC')->first();
                 $tick = Tick::createRow();
                 $tick->date = strtotime($twse->d);
@@ -115,7 +115,7 @@ while(1) {
                }
             }
         }
-        sleep(3);
+        sleep(2);
     }
     if ($now > $stop) {
         echo "已超過今日開盤時間 ". PHP_EOL;
